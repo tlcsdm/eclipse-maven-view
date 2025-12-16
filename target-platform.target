@@ -7,7 +7,23 @@
             <unit id="org.eclipse.platform.feature.group" version="0.0.0"/>
             <unit id="org.eclipse.jdt.feature.group" version="0.0.0"/>
             <unit id="org.eclipse.m2e.feature.feature.group" version="0.0.0"/>
+            <!-- For test -->
             <unit id="org.junit" version="0.0.0"/>
+            <unit id="org.eclipse.equinox.sdk.feature.group" version="0.0.0"/>
+            <unit id="org.eclipse.emf.common.feature.group" version="0.0.0"/>
+            <unit id="org.eclipse.emf.ecore.feature.group" version="0.0.0"/>
+            <unit id="org.eclipse.emf.ecore.edit.feature.group" version="0.0.0"/>
+            <unit id="org.eclipse.emf.edit.feature.group" version="0.0.0"/>
+            <unit id="org.eclipse.jdt.junit.runtime" version="0.0.0"/>
+            <unit id="org.eclipse.jdt.junit4.runtime" version="0.0.0"/>
+            <unit id="org.eclipse.sdk.feature.group" version="0.0.0"/>
+            <unit id="org.eclipse.wst.common_core.feature.feature.group" version="0.0.0"/>
+            <unit id="org.eclipse.wst.common.project.facet.core" version="0.0.0"/>
+            <unit id="org.eclipse.wst.xml_core.feature.feature.group" version="0.0.0"/>
+            <unit id="org.eclipse.xsd" version="0.0.0"/>
+            <unit id="com.google.guava" version="0.0.0"/>
+            <unit id="org.hamcrest.core" version="0.0.0"/>
+            <unit id="org.hamcrest.library" version="0.0.0"/>
         </location>
         <location includeAllPlatforms="false" includeConfigurePhase="true" includeMode="planner" includeSource="true" type="InstallableUnit">
             <repository location="https://mirrors.aliyun.com/eclipse/technology/swtbot/releases/4.2.1/"/>
