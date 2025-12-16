@@ -2,6 +2,8 @@
 
 A plug-in that recreates IntelliJ IDEA's Maven View for Eclipse.
 
+Now Support Eclipse 2024-06 and later, Mac OS X, Linux (with nautilus) and Windows.
+
 ## Use
 
 <img src="demo.png" alt="demo" title="demo"/>
@@ -44,3 +46,4 @@ mvn clean org.eclipse.tycho:tycho-versions-plugin:set-version -DnewVersion=2.0.0
   </tbody>
 
 </table>
+
