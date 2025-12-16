@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature id="com.tlcsdm.eclipse.mavenview.feature" version="0.0.0">
+      <category name="com.tlcsdm.eclipse"/>
+   </feature>
+   <category-def name="com.tlcsdm.eclipse" label="com.tlcsdm.eclipse">
+      <description>
+         Tlcsdm Eclpise Plugins
+      </description>
+   </category-def>
+</site>

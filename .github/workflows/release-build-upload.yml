@@ -1,0 +1,33 @@
+name: Build and Upload Artifacts on Release
+
+on:
+  release:
+    types: [published] # 只在正式发布时触发，如果需要草稿或预发布可添加: created, prereleased
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      # 根据你的项目类型选择合适的构建工具，比如 Maven/Gradle/npm
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Set up Maven
+        uses: stCarolas/setup-maven@v5
+        with:
+          maven-version: '3.9.9'
+      - name: Build with Maven
+        run: mvn -B clean verify -ntp -DskipTests
+
+      - name: Upload artifact to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: sites/com.tlcsdm.eclipse.mavenview.site/target/*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

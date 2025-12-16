@@ -1,0 +1,61 @@
+name: Bug report
+description: Create a report to help us improve
+title: "[Bug] "
+labels:
+  - bug
+assignees: unknowIfGuestInDream
+body:
+  - type: input
+    id: java-version
+    attributes:
+      label: which version of java are you using?
+      description: which version of the JRE/JDK are you using
+
+  - type: checkboxes
+    id: operating-systems
+    attributes:
+      label: Which operating system are you using?
+      description: You may select more than one. Don't select anything if it's not about the environment.
+      options:
+        - label: macOS
+        - label: Windows
+        - label: Linux
+
+  - type: input
+    id: version
+    attributes:
+      label: Version since
+      description: Version since when the behavior is seen [e.g. 1.0.0]
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce-context
+    attributes:
+      label: To Reproduce
+      description: Steps to reproduce the behavior.
+
+  - type: textarea
+    id: expected-context
+    attributes:
+      label: Expected behavior
+      placeholder: A clear and concise description of what you expected to happen.
+
+  - type: textarea
+    id: screenshots-context
+    attributes:
+      label: Screenshots
+      description: If applicable, add screenshots to help explain your problem.
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: If you are not reporting something obvious, a minial reproductin repo and related log is required.
+      placeholder: Add any other context about the problem here. Especially the issue occurs in certain OS, browser or configuation.
