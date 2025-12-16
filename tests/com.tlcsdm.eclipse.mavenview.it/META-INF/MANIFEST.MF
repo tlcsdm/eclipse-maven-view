@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Automatic-Module-Name: com.tlcsdm.eclipse.mavenview.it
+Bundle-Name: Maven View IT Fragment
+Bundle-SymbolicName: com.tlcsdm.eclipse.mavenview.it;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: Tlcsdm
+Fragment-Host: com.tlcsdm.eclipse.mavenview
+Bundle-RequiredExecutionEnvironment: JavaSE-17
+Export-Package: com.tlcsdm.eclipse.mavenview
+Require-Bundle: org.eclipse.jdt.junit.runtime,
+ org.eclipse.jdt.ui,
+ org.junit

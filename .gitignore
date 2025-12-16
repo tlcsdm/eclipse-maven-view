@@ -30,6 +30,7 @@ buildNumber.properties
 *.takari_issue_192
 .META-INF_MANIFEST.MF
 .m2
+tests/screenshots/
 
 ### Releng ###
 .buildTemp/
