@@ -48,7 +48,7 @@ public class MavenRunner {
 	private final static String POM_FILE_NAME = "pom.xml"; //$NON-NLS-1$
 
 	// Misc constants
-	public final static String ATTR_CONFIG = "de.slothsoft.mavenview.config"; //$NON-NLS-1$
+	public final static String ATTR_CONFIG = "com.tlcsdm.eclipse.mavenview.config"; //$NON-NLS-1$
 
 	private final String mode = "run";
 

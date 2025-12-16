@@ -16,7 +16,7 @@ public class MavenView extends ViewPart {
 	/**
 	 * The ID of the view as specified by the extension.
 	 */
-	public static final String ID = "de.slothsoft.mavenview.MavenView";
+	public static final String ID = "com.tlcsdm.eclipse.mavenview.MavenView";
 
 	TreeViewer viewer;
 
