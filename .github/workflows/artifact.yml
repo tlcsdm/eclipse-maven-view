@@ -22,12 +22,12 @@ jobs:
     - name: Build with Maven
       run: mvn -B clean verify -ntp -DskipTests
     - name: Archive plugin dist
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: plugin
         path: sites/com.tlcsdm.eclipse.mavenview.site/target/*.zip
     - name: Archive test results
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: update_site
         path: sites/com.tlcsdm.eclipse.mavenview.site/target/repository
