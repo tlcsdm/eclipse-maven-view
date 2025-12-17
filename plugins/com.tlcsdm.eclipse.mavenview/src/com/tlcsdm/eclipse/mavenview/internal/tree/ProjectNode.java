@@ -19,7 +19,7 @@ import com.tlcsdm.eclipse.mavenview.MavenRunner;
 
 public class ProjectNode implements Displayable, Parentable {
 
-	private static final String WORKING_DIR_PREFIX = "${project_loc:";
+	private static final String WORKING_DIR_PREFIX = "${workspace_loc:/";
 	private static final String WORKING_DIR_SUFFIX = "}";
 
 	private final IProject project;
