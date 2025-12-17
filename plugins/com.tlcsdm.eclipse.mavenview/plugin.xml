@@ -41,6 +41,10 @@
             id="com.tlcsdm.eclipse.mavenview.commands.settings"
             name="%command.settings">
       </command>
+      <command
+            id="com.tlcsdm.eclipse.mavenview.commands.mavenSettings"
+            name="%command.mavenSettings">
+      </command>
    </extension>
    
    <extension
@@ -72,6 +76,10 @@
       <image
             commandId="com.tlcsdm.eclipse.mavenview.commands.settings"
             icon="icons/settings.png">
+      </image>
+      <image
+            commandId="com.tlcsdm.eclipse.mavenview.commands.mavenSettings"
+            icon="icons/maven.png">
       </image>
    </extension>
    
@@ -122,6 +130,10 @@
       <handler
             class="com.tlcsdm.eclipse.mavenview.internal.handler.SettingsHandler"
             commandId="com.tlcsdm.eclipse.mavenview.commands.settings">
+      </handler>
+      <handler
+            class="com.tlcsdm.eclipse.mavenview.internal.handler.OpenMavenSettingsHandler"
+            commandId="com.tlcsdm.eclipse.mavenview.commands.mavenSettings">
       </handler>
    </extension>
    
@@ -182,6 +194,15 @@
          <command
                commandId="com.tlcsdm.eclipse.mavenview.commands.changeDisplayedProjects"
                id="changeDisplayedProjects" />
+         <command
+               commandId="com.tlcsdm.eclipse.mavenview.commands.mavenSettings"
+               id="mavenSettings" >
+            <visibleWhen>
+                <iterate ifEmpty="false">
+                        <instanceof value="com.tlcsdm.eclipse.mavenview.internal.tree.LaunchConfigNode"/>
+                </iterate>
+            </visibleWhen>
+         </command>
       </menuContribution>
    </extension>
    
