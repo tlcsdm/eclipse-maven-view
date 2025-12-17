@@ -4,12 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE.SharedImages;
@@ -75,13 +81,45 @@ public class ProjectNode implements Displayable, Parentable {
 
 	@Override
 	public Object[] getChildren() {
+		// Build children dynamically: optionally ProfilesNode, PhasesNode and launch
+		// configs
+		final List<Object> children = new ArrayList<>();
+
+		// add profiles node if project has selected profiles
+		String[] selectedProfiles = readSelectedProfiles(this.project);
+//		if (selectedProfiles != null && selectedProfiles.length > 0) {
+//			children.add(new ProfilesNode(this, selectedProfiles));
+//		}
+
+		// phases
+		children.add(new PhasesNode(this));
+
+		// launch configs
 		if (this.launchConfigs.length > 0) {
-			final Object[] children = new Object[2];
-			children[0] = new PhasesNode(this);
-			children[1] = new launchConfigsNode(this, this.launchConfigs);
-			return children;
+			children.add(new launchConfigsNode(this, this.launchConfigs));
 		}
-		return PhaseNode.createDisplayed(this);
+		if (this.launchConfigs.length == 0) {
+			return PhaseNode.createDisplayed(this);
+		}
+
+		return children.toArray(new Object[children.size()]);
+	}
+
+	private static String[] readSelectedProfiles(IProject project) {
+		try {
+			final IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
+			final IFile pomFile = project.getFile(new Path(MavenRunner.POM_FILE_NAME));
+			final IMavenProjectFacade projectFacade = projectManager.create(pomFile, false, new NullProgressMonitor());
+			if (projectFacade != null) {
+				final String selectedProfiles = projectFacade.getConfiguration().getSelectedProfiles();
+				if (selectedProfiles != null && selectedProfiles.length() > 0) {
+					return selectedProfiles.split(",");
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return new String[0];
 	}
 
 	@Override

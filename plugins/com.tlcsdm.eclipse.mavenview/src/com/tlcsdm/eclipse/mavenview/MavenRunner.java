@@ -46,7 +46,7 @@ public class MavenRunner {
 	public final static String ATTR_WORKING_DIRECTORY = IJavaLaunchConfigurationConstants.ATTR_WORKING_DIRECTORY;
 
 	// Constants from org.eclipse.m2e.core.internalIMavenConstants
-	private final static String POM_FILE_NAME = "pom.xml"; //$NON-NLS-1$
+	public final static String POM_FILE_NAME = "pom.xml"; //$NON-NLS-1$
 
 	// Misc constants
 	public final static String ATTR_CONFIG = "com.tlcsdm.eclipse.mavenview.config"; //$NON-NLS-1$
