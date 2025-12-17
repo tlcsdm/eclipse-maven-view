@@ -22,6 +22,14 @@
             id="com.tlcsdm.eclipse.mavenview.commands.changeDisplayedProjects"
             name="%command.changeDisplayedProjects">
       </command>
+      <command
+            id="com.tlcsdm.eclipse.mavenview.commands.expandAll"
+            name="%command.expandAll">
+      </command>
+      <command
+            id="com.tlcsdm.eclipse.mavenview.commands.collapseAll"
+            name="%command.collapseAll">
+      </command>
    </extension>
    
    <extension
@@ -37,6 +45,14 @@
       <image
             commandId="com.tlcsdm.eclipse.mavenview.commands.changeDisplayedProjects"
             icon="icons/change-displayed-project.png">
+      </image>
+      <image
+            commandId="com.tlcsdm.eclipse.mavenview.commands.expandAll"
+            icon="icons/expandall.png">
+      </image>
+      <image
+            commandId="com.tlcsdm.eclipse.mavenview.commands.collapseAll"
+            icon="icons/collapseall.png">
       </image>
    </extension>
    
@@ -54,6 +70,14 @@
             class="com.tlcsdm.eclipse.mavenview.internal.handler.ChangeDisplayedProjectsHandler"
             commandId="com.tlcsdm.eclipse.mavenview.commands.changeDisplayedProjects">
       </handler>
+      <handler
+            class="com.tlcsdm.eclipse.mavenview.internal.handler.ExpandAllHandler"
+            commandId="com.tlcsdm.eclipse.mavenview.commands.expandAll">
+      </handler>
+      <handler
+            class="com.tlcsdm.eclipse.mavenview.internal.handler.CollapseAllHandler"
+            commandId="com.tlcsdm.eclipse.mavenview.commands.collapseAll">
+      </handler>
    </extension>
    
    <extension
@@ -61,15 +85,21 @@
       <menuContribution
             locationURI="toolbar:com.tlcsdm.eclipse.mavenview.MavenView">
          <command
-               commandId="com.tlcsdm.eclipse.mavenview.commands.runMavenPhases"
-               id="runMavenPhases" />
+               commandId="com.tlcsdm.eclipse.mavenview.commands.refresh"
+               id="refresh" />
          <separator
                name="com.tlcsdm.eclipse.mavenview.separator1"
                visible="true">
          </separator>
          <command
-               commandId="com.tlcsdm.eclipse.mavenview.commands.refresh"
-               id="refresh" />
+               commandId="com.tlcsdm.eclipse.mavenview.commands.runMavenPhases"
+               id="runMavenPhases" />
+         <command
+               commandId="com.tlcsdm.eclipse.mavenview.commands.expandAll"
+               id="expandAll" />
+         <command
+               commandId="com.tlcsdm.eclipse.mavenview.commands.collapseAll"
+               id="collapseAll" />
          <separator
                name="com.tlcsdm.eclipse.mavenview.separator2"
                visible="true">
@@ -86,7 +116,7 @@
                id="runMavenPhases">
          </command>
          <separator
-               name="com.tlcsdm.eclipse.mavenview.separator2"
+               name="com.tlcsdm.eclipse.mavenview.separator.popup1"
                visible="true">
          </separator>
          <command
@@ -94,7 +124,7 @@
                id="refresh">
          </command>
          <separator
-               name="com.tlcsdm.eclipse.mavenview.separator2"
+               name="com.tlcsdm.eclipse.mavenview.separator.popup2"
                visible="true">
          </separator>
          <command
