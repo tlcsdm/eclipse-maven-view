@@ -8,14 +8,19 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.ViewPart;
 
 import com.tlcsdm.eclipse.mavenview.internal.DisplayableLabelProvider;
+import com.tlcsdm.eclipse.mavenview.internal.tree.LaunchConfigNode;
+import com.tlcsdm.eclipse.mavenview.internal.tree.PhaseNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.ProjectNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.ProjectTreeContentProvider;
 
@@ -41,7 +46,13 @@ public class MavenView extends ViewPart {
 		if (inputNodes != null && inputNodes.length == 1) {
 			this.viewer.expandAll();
 		}
-
+		this.viewer.addDoubleClickListener(event -> {
+			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+			Object selectedElement = selection.getFirstElement();
+			if (selectedElement instanceof PhaseNode || selectedElement instanceof LaunchConfigNode) {
+				executeCommand(selectedElement);
+			}
+		});
 		hookMenuToViewer();
 		hookResourceListener();
 
@@ -52,6 +63,16 @@ public class MavenView extends ViewPart {
 		final Object[] expandedElements = this.viewer.getExpandedElements();
 		this.viewer.setInput(ProjectTreeContentProvider.fetchMavenProjects());
 		this.viewer.setExpandedElements(expandedElements);
+	}
+
+	private void executeCommand(Object selectedNode) {
+		try {
+			IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench()
+					.getService(IHandlerService.class);
+			handlerService.executeCommand("com.tlcsdm.eclipse.mavenview.commands.runMavenPhases", null);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void hookMenuToViewer() {
