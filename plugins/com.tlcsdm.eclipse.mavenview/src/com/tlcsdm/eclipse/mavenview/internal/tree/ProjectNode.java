@@ -74,11 +74,9 @@ public class ProjectNode implements Displayable, Parentable {
 	@Override
 	public Object[] getChildren() {
 		if (this.launchConfigs.length > 0) {
-			final Object[] children = new Object[this.launchConfigs.length + 1];
-			for (int i = 0; i < this.launchConfigs.length; i++) {
-				children[i] = new LaunchConfigNode(this.launchConfigs[i]);
-			}
-			children[children.length - 1] = new PhasesNode(this);
+			final Object[] children = new Object[2];
+			children[0] = new PhasesNode(this);
+			children[1] = new launchConfigsNode(this, this.launchConfigs);
 			return children;
 		}
 		return PhaseNode.createDisplayed(this);
