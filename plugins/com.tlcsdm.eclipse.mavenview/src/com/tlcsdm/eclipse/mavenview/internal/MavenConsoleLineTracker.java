@@ -11,6 +11,49 @@ import org.eclipse.jface.text.IRegion;
 import com.tlcsdm.eclipse.mavenview.MavenRunConfig;
 import com.tlcsdm.eclipse.mavenview.MavenRunner;
 
+/**
+ * A console line tracker that enhances Maven-related Java launch consoles by
+ * injecting Maven execution context information at console initialization time.
+ * <p>
+ * This tracker is registered via the
+ * {@code org.eclipse.debug.ui.consoleLineTrackers} extension point and is bound
+ * to Java processes ({@code processType="java"}). When a Java process is
+ * started through a Maven launch configuration, this tracker retrieves the
+ * associated {@link ILaunchConfiguration} and extracts the
+ * {@link MavenRunConfig} stored in its attributes.
+ * </p>
+ *
+ * <p>
+ * If a {@link MavenRunConfig} is present, a formatted header is inserted at the
+ * very beginning of the console document. The header typically includes:
+ * </p>
+ * <ul>
+ * <li>The Maven working directory</li>
+ * <li>The executed Maven phases or goals</li>
+ * </ul>
+ *
+ * <p>
+ * The injected output follows Maven-style log formatting (e.g. {@code [INFO]}
+ * prefixes) to remain visually consistent with standard Maven console output.
+ * </p>
+ *
+ * <p>
+ * This implementation does <strong>not</strong> process individual console
+ * lines. The {@link #lineAppended(IRegion)} method is intentionally left
+ * unused, making this tracker a lightweight, initialization-only console
+ * enhancement.
+ * </p>
+ *
+ * <p>
+ * Any exceptions encountered during initialization (for example, missing launch
+ * attributes or document modification errors) are deliberately ignored to
+ * ensure that console rendering and Maven execution are never disrupted.
+ * </p>
+ *
+ * @see org.eclipse.debug.ui.console.IConsoleLineTracker
+ * @see org.eclipse.debug.core.ILaunchConfiguration
+ * @see org.eclipse.jface.text.IDocument
+ */
 public class MavenConsoleLineTracker implements IConsoleLineTracker {
 
 	private static final String CONSOLE_PREFIX = "[INFO] ";

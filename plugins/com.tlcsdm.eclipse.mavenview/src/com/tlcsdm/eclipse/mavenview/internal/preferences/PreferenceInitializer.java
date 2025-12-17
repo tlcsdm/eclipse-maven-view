@@ -19,6 +19,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(MavenViewPreferences.INITIAL_PROJECT_SELECTION, InitialProjectSelection.ROOT_PROJECTS.name());
 		store.setDefault(MavenViewPreferences.DISPLAYED_PHASES,
 				MavenViewPreferences.getDisplayedPhasesString(Phase.values()));
+		store.setDefault(MavenViewPreferences.SKIP_TESTS, false);
 	}
 
 }
