@@ -17,6 +17,7 @@ public final class MavenViewPreferences {
 	public static final String DISPLAYED_PHASES = "displayedPhases";
 	public static final String ALWAYS_SELECTED_PROJECTS = "alwaysSelectedProjects";
 	public static final String NEVER_SELECTED_PROJECTS = "neverSelectedProjects";
+	public static final String SKIP_TESTS = "skipTests";
 
 	static final String SEPARATOR = "\n";
 

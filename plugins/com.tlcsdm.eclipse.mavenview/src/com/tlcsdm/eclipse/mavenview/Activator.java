@@ -2,10 +2,15 @@ package com.tlcsdm.eclipse.mavenview;
 
 import java.util.Objects;
 
+import org.eclipse.core.commands.Command;
+import org.eclipse.core.commands.State;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -41,6 +46,18 @@ public class Activator extends AbstractUIPlugin {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
+		syncCommandStateFromPreference();
+	}
+
+	public static void syncCommandStateFromPreference() {
+		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+		boolean prefValue = store.getBoolean(MavenViewPreferences.SKIP_TESTS);
+		ICommandService commandService = PlatformUI.getWorkbench().getService(ICommandService.class);
+		Command command = commandService.getCommand("com.tlcsdm.eclipse.mavenview.commands.skipTests");
+		State state = command.getState("org.eclipse.ui.commands.toggleState");
+		if (state != null) {
+			state.setValue(prefValue);
+		}
 	}
 
 	/*

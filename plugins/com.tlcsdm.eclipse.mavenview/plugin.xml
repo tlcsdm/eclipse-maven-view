@@ -30,6 +30,17 @@
             id="com.tlcsdm.eclipse.mavenview.commands.collapseAll"
             name="%command.collapseAll">
       </command>
+      <command
+            id="com.tlcsdm.eclipse.mavenview.commands.skipTests"
+            name="%command.skipTests">
+          <state
+                class="org.eclipse.ui.handlers.RegistryToggleState:false"
+                id="org.eclipse.ui.commands.toggleState" />
+      </command>
+      <command
+            id="com.tlcsdm.eclipse.mavenview.commands.settings"
+            name="%command.settings">
+      </command>
    </extension>
    
    <extension
@@ -53,6 +64,14 @@
       <image
             commandId="com.tlcsdm.eclipse.mavenview.commands.collapseAll"
             icon="icons/collapseall.png">
+      </image>
+      <image
+            commandId="com.tlcsdm.eclipse.mavenview.commands.skipTests"
+            icon="icons/skip.png">
+      </image>
+      <image
+            commandId="com.tlcsdm.eclipse.mavenview.commands.settings"
+            icon="icons/settings.png">
       </image>
    </extension>
    
@@ -78,6 +97,14 @@
             class="com.tlcsdm.eclipse.mavenview.internal.handler.CollapseAllHandler"
             commandId="com.tlcsdm.eclipse.mavenview.commands.collapseAll">
       </handler>
+      <handler
+            class="com.tlcsdm.eclipse.mavenview.internal.handler.SkipTestsHandler"
+            commandId="com.tlcsdm.eclipse.mavenview.commands.skipTests">
+      </handler>
+      <handler
+            class="com.tlcsdm.eclipse.mavenview.internal.handler.SettingsHandler"
+            commandId="com.tlcsdm.eclipse.mavenview.commands.settings">
+      </handler>
    </extension>
    
    <extension
@@ -95,6 +122,10 @@
                commandId="com.tlcsdm.eclipse.mavenview.commands.runMavenPhases"
                id="runMavenPhases" />
          <command
+               commandId="com.tlcsdm.eclipse.mavenview.commands.skipTests"
+               id="skipTests"
+               style="toggle"/>
+         <command
                commandId="com.tlcsdm.eclipse.mavenview.commands.expandAll"
                id="expandAll" />
          <command
@@ -107,6 +138,9 @@
          <command
                commandId="com.tlcsdm.eclipse.mavenview.commands.changeDisplayedProjects"
                id="changeDisplayedProjects" />
+         <command
+               commandId="com.tlcsdm.eclipse.mavenview.commands.settings"
+               id="settings" />
       </menuContribution>
       <menuContribution
             allPopups="false"
