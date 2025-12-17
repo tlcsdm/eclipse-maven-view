@@ -79,7 +79,7 @@
       point="org.eclipse.core.runtime.adapters">
       <factory
          adaptableType="org.eclipse.jface.viewers.IStructuredSelection"
-         class="com.tlcsdm.eclipse.mavenview.internal.adapters.MavenViewAdapterFactory">
+         class="com.tlcsdm.eclipse.mavenview.internal.tree.MavenViewAdapterFactory">
         <adapter type="com.tlcsdm.eclipse.mavenview.internal.tree.PhaseNode"/>
         <adapter type="com.tlcsdm.eclipse.mavenview.internal.tree.LaunchConfigNode"/>
       </factory>
