@@ -16,20 +16,24 @@
 .gitignore                    @unknowIfGuestInDream
 
 # features
-features/**                   @unknowIfGuestInDream
+features/**                   @unknowIfGuestInDream @DreamAwakenFateBroke
 
 # plugins
-plugins/**                    @unknowIfGuestInDream
+plugins/**                    @unknowIfGuestInDream @DreamAwakenFateBroke
 
 # sites
-sites/**                      @unknowIfGuestInDream
+sites/**                      @unknowIfGuestInDream @DreamAwakenFateBroke
 
 # update_site
 update_site/**                @unknowIfGuestInDream
 
+# tests
+tests/**                      @unknowIfGuestInDream @DreamAwakenFateBroke
+
 # Document
 LICENSE                       @unknowIfGuestInDream
 README.md                     @unknowIfGuestInDream
+readme/**                     @unknowIfGuestInDream @DreamAwakenFateBroke
 
 # Maven
 .mvn/**                       @unknowIfGuestInDream @DreamAwakenFateBroke

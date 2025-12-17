@@ -9,6 +9,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.part.ViewPart;
 
 import com.tlcsdm.eclipse.mavenview.internal.DisplayableLabelProvider;
+import com.tlcsdm.eclipse.mavenview.internal.tree.ProjectNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.ProjectTreeContentProvider;
 
 public class MavenView extends ViewPart {
@@ -24,11 +25,14 @@ public class MavenView extends ViewPart {
 	public void createPartControl(Composite parent) {
 		this.viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 
-		this.viewer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
+		this.viewer.setAutoExpandLevel(AbstractTreeViewer.NO_EXPAND);
 		this.viewer.setLabelProvider(new DisplayableLabelProvider());
 		this.viewer.setContentProvider(new ProjectTreeContentProvider());
-		this.viewer.setInput(ProjectTreeContentProvider.fetchMavenProjects());
-		this.viewer.expandAll();
+		ProjectNode[] inputNodes = ProjectTreeContentProvider.fetchMavenProjects();
+		this.viewer.setInput(inputNodes);
+		if (inputNodes != null && inputNodes.length == 1) {
+			this.viewer.expandAll();
+		}
 
 		hookMenuToViewer();
 

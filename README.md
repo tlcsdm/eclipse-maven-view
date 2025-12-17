@@ -6,7 +6,7 @@ Now Support Eclipse 2024-06 and later, Mac OS X, Linux (with nautilus) and Windo
 
 ## Use
 
-<img src="demo.png" alt="demo" title="demo"/>
+<img src="readme/demo.png" alt="demo" title="demo"/>
 
 ## History
 Fork of [eclipse-maven-view](https://github.com/slothsoft/eclipse-maven-view) on Github.
