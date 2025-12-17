@@ -20,6 +20,7 @@ import com.tlcsdm.eclipse.mavenview.MavenRunner;
 public class ProjectNode implements Displayable, Parentable {
 
 	private static final String WORKING_DIR_PREFIX = "${workspace_loc:/";
+	private static final String WORKING_PROJECT_PREFIX = "${project_loc:";
 	private static final String WORKING_DIR_SUFFIX = "}";
 
 	private final IProject project;
@@ -39,13 +40,14 @@ public class ProjectNode implements Displayable, Parentable {
 		try {
 			final ILaunchConfiguration[] launchConfigurations = launchManager
 					.getLaunchConfigurations(launchConfigurationType);
-			final String projectLocation = WORKING_DIR_PREFIX + project.getName() + WORKING_DIR_SUFFIX;
+			final String wkLocation = WORKING_DIR_PREFIX + project.getName() + WORKING_DIR_SUFFIX;
+			final String projectLocation = WORKING_PROJECT_PREFIX + project.getName() + WORKING_DIR_SUFFIX;
 			final List<ILaunchConfiguration> result = new ArrayList<>(launchConfigurations.length);
 
 			for (final ILaunchConfiguration configuration : launchConfigurations) {
 				final String workingDirectory = configuration.getAttribute(MavenRunner.ATTR_WORKING_DIRECTORY,
 						(String) null);
-				if (projectLocation.equals(workingDirectory)) {
+				if (wkLocation.equals(workingDirectory) || projectLocation.equals(workingDirectory)) {
 					result.add(configuration);
 				}
 			}
