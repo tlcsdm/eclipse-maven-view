@@ -24,8 +24,8 @@ import org.eclipse.ui.part.ViewPart;
 
 import com.tlcsdm.eclipse.mavenview.internal.DisplayableLabelProvider;
 import com.tlcsdm.eclipse.mavenview.internal.tree.LaunchConfigNode;
-import com.tlcsdm.eclipse.mavenview.internal.tree.Parentable;
 import com.tlcsdm.eclipse.mavenview.internal.tree.PhaseNode;
+import com.tlcsdm.eclipse.mavenview.internal.tree.PhasesNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.ProjectNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.ProjectTreeContentProvider;
 
@@ -51,7 +51,8 @@ public class MavenView extends ViewPart {
 			@Override
 			public void treeExpanded(TreeExpansionEvent event) {
 				Object element = event.getElement();
-				if (element instanceof Parentable) {
+				// Refresh phase nodes to show updated status icons for `test` phase
+				if (element instanceof ProjectNode || element instanceof PhasesNode) {
 					Display.getDefault().asyncExec(() -> {
 						viewer.refresh(element, true);
 					});
