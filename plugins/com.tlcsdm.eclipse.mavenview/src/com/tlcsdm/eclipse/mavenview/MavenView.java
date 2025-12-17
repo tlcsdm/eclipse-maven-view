@@ -1,10 +1,17 @@
 package com.tlcsdm.eclipse.mavenview;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.part.ViewPart;
 
@@ -20,6 +27,7 @@ public class MavenView extends ViewPart {
 	public static final String ID = "com.tlcsdm.eclipse.mavenview.MavenView";
 
 	TreeViewer viewer;
+	private IResourceChangeListener resourceChangeListener;
 
 	@Override
 	public void createPartControl(Composite parent) {
@@ -35,6 +43,7 @@ public class MavenView extends ViewPart {
 		}
 
 		hookMenuToViewer();
+		hookResourceListener();
 
 		getSite().setSelectionProvider(this.viewer);
 	}
@@ -52,6 +61,34 @@ public class MavenView extends ViewPart {
 		getSite().registerContextMenu(menuManager, this.viewer);
 	}
 
+	private void hookResourceListener() {
+		resourceChangeListener = event -> {
+			if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
+				handleResourceChanged(event);
+			}
+		};
+
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceChangeListener,
+				IResourceChangeEvent.POST_CHANGE);
+	}
+
+	private void handleResourceChanged(IResourceChangeEvent event) {
+		try {
+			event.getDelta().accept(delta -> {
+				IResource resource = delta.getResource();
+
+				if (resource instanceof IProject) {
+					Display.getDefault().asyncExec(() -> {
+						refresh();
+					});
+				}
+				return true;
+			});
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+	}
+
 	@Override
 	public void setFocus() {
 		this.viewer.getControl().setFocus();
@@ -63,6 +100,14 @@ public class MavenView extends ViewPart {
 
 	public void expandAll() {
 		this.viewer.expandAll();
+	}
+
+	@Override
+	public void dispose() {
+		if (resourceChangeListener != null) {
+			ResourcesPlugin.getWorkspace().removeResourceChangeListener(resourceChangeListener);
+		}
+		super.dispose();
 	}
 
 }
