@@ -2,6 +2,8 @@ package com.tlcsdm.eclipse.mavenview.internal.preferences;
 
 import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
@@ -15,18 +17,27 @@ import com.tlcsdm.eclipse.mavenview.InitialProjectSelection;
 import com.tlcsdm.eclipse.mavenview.MavenView;
 import com.tlcsdm.eclipse.mavenview.MavenViewPreferences;
 import com.tlcsdm.eclipse.mavenview.Phase;
-import com.tlcsdm.eclipse.mavenview.internal.DisplayableLabelProvider;
 import com.tlcsdm.eclipse.mavenview.internal.Messages;
 import com.tlcsdm.eclipse.mavenview.internal.common.CheckTableFieldEditor;
 import com.tlcsdm.eclipse.mavenview.internal.common.CheckTableFieldEditor.PreferenceLabelProvider;
 
 public class MavenViewPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-	static class PhaseLabelProvider extends DisplayableLabelProvider implements PreferenceLabelProvider {
+	static class PhaseLabelProvider extends LabelProvider implements PreferenceLabelProvider {
 
 		@Override
 		public String getPreference(Object element) {
 			return ((Phase) element).name();
+		}
+
+		@Override
+		public String getText(Object obj) {
+			return obj instanceof Displayable ? ((Displayable) obj).getDisplayName() : null;
+		}
+
+		@Override
+		public Image getImage(Object obj) {
+			return obj instanceof Displayable ? ((Displayable) obj).getImage() : null;
 		}
 	}
 

@@ -7,8 +7,12 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeViewerListener;
+import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -20,6 +24,7 @@ import org.eclipse.ui.part.ViewPart;
 
 import com.tlcsdm.eclipse.mavenview.internal.DisplayableLabelProvider;
 import com.tlcsdm.eclipse.mavenview.internal.tree.LaunchConfigNode;
+import com.tlcsdm.eclipse.mavenview.internal.tree.Parentable;
 import com.tlcsdm.eclipse.mavenview.internal.tree.PhaseNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.ProjectNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.ProjectTreeContentProvider;
@@ -41,6 +46,23 @@ public class MavenView extends ViewPart {
 		this.viewer.setAutoExpandLevel(AbstractTreeViewer.NO_EXPAND);
 		this.viewer.setLabelProvider(new DisplayableLabelProvider());
 		this.viewer.setContentProvider(new ProjectTreeContentProvider());
+		this.viewer.addTreeListener(new ITreeViewerListener() {
+
+			@Override
+			public void treeExpanded(TreeExpansionEvent event) {
+				Object element = event.getElement();
+				if (element instanceof Parentable) {
+					Display.getDefault().asyncExec(() -> {
+						viewer.refresh(element, true);
+					});
+				}
+			}
+
+			@Override
+			public void treeCollapsed(TreeExpansionEvent event) {
+				// do nothing
+			}
+		});
 		ProjectNode[] inputNodes = ProjectTreeContentProvider.fetchMavenProjects();
 		this.viewer.setInput(inputNodes);
 		if (inputNodes != null && inputNodes.length == 1) {
@@ -55,6 +77,7 @@ public class MavenView extends ViewPart {
 		});
 		hookMenuToViewer();
 		hookResourceListener();
+		hookPreferenceListener();
 
 		getSite().setSelectionProvider(this.viewer);
 	}
@@ -63,6 +86,7 @@ public class MavenView extends ViewPart {
 		final Object[] expandedElements = this.viewer.getExpandedElements();
 		this.viewer.setInput(ProjectTreeContentProvider.fetchMavenProjects());
 		this.viewer.setExpandedElements(expandedElements);
+		this.viewer.refresh(true);
 	}
 
 	private void executeCommand(Object selectedNode) {
@@ -110,6 +134,22 @@ public class MavenView extends ViewPart {
 		}
 	}
 
+	private void hookPreferenceListener() {
+		Activator.getDefault().getPreferenceStore().addPropertyChangeListener(preferenceChangeListener);
+	}
+
+	IPropertyChangeListener preferenceChangeListener = new IPropertyChangeListener() {
+
+		public void propertyChange(PropertyChangeEvent event) {
+			if (MavenViewPreferences.SKIP_TESTS.equals(event.getProperty())) {
+				Display.getDefault().asyncExec(() -> {
+					viewer.refresh(true);
+				});
+			}
+		}
+
+	};
+
 	@Override
 	public void setFocus() {
 		this.viewer.getControl().setFocus();
@@ -121,12 +161,16 @@ public class MavenView extends ViewPart {
 
 	public void expandAll() {
 		this.viewer.expandAll();
+		this.viewer.refresh(true);
 	}
 
 	@Override
 	public void dispose() {
 		if (resourceChangeListener != null) {
 			ResourcesPlugin.getWorkspace().removeResourceChangeListener(resourceChangeListener);
+		}
+		if (preferenceChangeListener != null) {
+			Activator.getDefault().getPreferenceStore().removePropertyChangeListener(preferenceChangeListener);
 		}
 		super.dispose();
 	}

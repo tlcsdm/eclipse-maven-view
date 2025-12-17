@@ -11,9 +11,6 @@ import com.tlcsdm.eclipse.mavenview.MavenView;
 
 public class RefreshHandler extends AbstractHandler {
 
-	// TODO: ChangeDisplayedProjectsHandler refreshes, too, so maybe this should be
-	// the same code
-
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		final MavenView mavenView = findMavenView(event);
