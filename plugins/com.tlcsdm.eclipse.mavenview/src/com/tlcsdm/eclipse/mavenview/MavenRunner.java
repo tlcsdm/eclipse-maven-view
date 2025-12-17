@@ -42,6 +42,7 @@ public class MavenRunner {
 	public final static String LAUNCH_CONFIGURATION_TYPE_ID = "org.eclipse.m2e.Maven2LaunchConfigurationType"; //$NON-NLS-1$
 	private final static String ATTR_GOALS = "M2_GOALS"; //$NON-NLS-1$
 	private final static String ATTR_PROFILES = "M2_PROFILES"; //$NON-NLS-1$
+	private final static String ATTR_SKIP_TESTS = "M2_SKIP_TESTS";
 	public final static String ATTR_WORKING_DIRECTORY = IJavaLaunchConfigurationConstants.ATTR_WORKING_DIRECTORY;
 
 	// Constants from org.eclipse.m2e.core.internalIMavenConstants
@@ -116,6 +117,8 @@ public class MavenRunner {
 		workingCopy.setAttribute(IDebugUIConstants.ATTR_PRIVATE, true);
 		workingCopy.setAttribute(RefreshTab.ATTR_REFRESH_SCOPE, "${project}"); //$NON-NLS-1$
 		workingCopy.setAttribute(RefreshTab.ATTR_REFRESH_RECURSIVE, true);
+		boolean skipTests = Activator.getDefault().getPreferenceStore().getBoolean(MavenViewPreferences.SKIP_TESTS);
+		workingCopy.setAttribute(MavenRunner.ATTR_SKIP_TESTS, skipTests);
 		workingCopy.setAttribute(ATTR_CONFIG, config);
 
 		setProjectConfiguration(workingCopy, basedir);
