@@ -2,7 +2,7 @@ package com.tlcsdm.eclipse.mavenview;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -84,7 +84,7 @@ public enum InitialProjectSelection implements Displayable {
 	public abstract IProject[] fetchMavenProjects();
 
 	static IProject[] collectMavenProjects(Predicate<IProject> tester) {
-		final Set<IProject> result = new HashSet<>();
+		final Set<IProject> result = new LinkedHashSet<>();
 		for (final IProject project : fetchAllMavenProjects()) {
 			if (tester.test(project)) {
 				result.add(project);
@@ -100,7 +100,7 @@ public enum InitialProjectSelection implements Displayable {
 		final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 		final IProject[] projects = workspaceRoot.getProjects();
 
-		final Set<IProject> result = new HashSet<>();
+		final Set<IProject> result = new LinkedHashSet<>();
 		for (int i = 0; i < projects.length; i++) {
 			final IProject project = projects[i];
 			try {
