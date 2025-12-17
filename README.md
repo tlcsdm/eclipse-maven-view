@@ -6,11 +6,21 @@ Now Support Eclipse 2024-06 and later, Mac OS X, Linux (with nautilus) and Windo
 
 ## Use
 
+Open the Maven View within Eclipse via `Window` > `Show View` > `Maven` and search for **Maven Runs**.
+
 <img src="readme/demo.png" alt="demo" title="demo"/>
+
+Customize settings according to your preference in Eclipse Preferences Settings.
+
 <img src="readme/pref.png" alt="demo" title="demo"/>
 
 ## History
-Fork of [eclipse-maven-view](https://github.com/slothsoft/eclipse-maven-view) on Github.
+Fork of [eclipse-maven-view](https://github.com/slothsoft/eclipse-maven-view) on Github. Over time, I have added several improvements and new features, including:
+
+- Full support for Eclipse 2024-06 and later releases.
+- Added `ExpandAll`, `CollapseAll`, `SkipTests`, and `Open maven Settings preferences` commands.
+- Optimize `Run` command conditions and styles.
+- Add view refresh on Project Creation / Renaming / Deletion
 
 ## Build
 
