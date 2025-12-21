@@ -124,27 +124,27 @@ public class ProjectNode implements Displayable, Parentable {
 			// Security: Disable external entities to prevent XXE attacks
 			try {
 				factory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
-			} catch (Exception e) {
+			} catch (javax.xml.parsers.ParserConfigurationException e) {
 				// Feature not supported, continue
 			}
 			try {
 				factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-			} catch (Exception e) {
+			} catch (javax.xml.parsers.ParserConfigurationException e) {
 				// Feature not supported, continue
 			}
 			try {
 				factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-			} catch (Exception e) {
+			} catch (javax.xml.parsers.ParserConfigurationException e) {
 				// Feature not supported, continue
 			}
 			try {
 				factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-			} catch (Exception e) {
+			} catch (javax.xml.parsers.ParserConfigurationException e) {
 				// Feature not supported, continue
 			}
 			try {
 				factory.setExpandEntityReferences(false);
-			} catch (Exception e) {
+			} catch (IllegalArgumentException e) {
 				// Feature not supported, continue
 			}
 			
@@ -188,7 +188,7 @@ public class ProjectNode implements Displayable, Parentable {
 				result.add(new Profile(profileId, activeByDefault));
 			}
 			
-			return result.toArray(new Profile[result.size()]);
+			return result.toArray(new Profile[0]);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
