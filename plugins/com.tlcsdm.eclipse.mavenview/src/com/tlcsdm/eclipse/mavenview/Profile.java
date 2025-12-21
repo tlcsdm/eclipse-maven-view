@@ -32,7 +32,7 @@ public class Profile implements Displayable {
 
 	@Override
 	public Image getImage() {
-		return Activator.getImage(MavenViewImages.OBJ_PROFILE);
+		return null;
 	}
 
 	@Override

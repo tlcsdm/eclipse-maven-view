@@ -27,7 +27,6 @@ import com.tlcsdm.eclipse.mavenview.internal.tree.LaunchConfigNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.PhaseNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.PhasesNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.ProfileNode;
-import com.tlcsdm.eclipse.mavenview.internal.tree.ProfilesNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.ProjectNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.ProjectTreeContentProvider;
 
