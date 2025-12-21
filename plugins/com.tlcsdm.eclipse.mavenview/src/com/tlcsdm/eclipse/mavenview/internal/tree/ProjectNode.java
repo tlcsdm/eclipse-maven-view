@@ -7,7 +7,11 @@ import java.util.Objects;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
@@ -112,12 +116,79 @@ public class ProjectNode implements Displayable, Parentable {
 
 	private static Profile[] readAvailableProfiles(IProject project) {
 		try {
+			// Use M2E to get the Maven project facade which includes effective model
+			final IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
 			final IFile pomFile = project.getFile(new Path(MavenRunner.POM_FILE_NAME));
+			final IMavenProjectFacade projectFacade = projectManager.create(pomFile, false, new NullProgressMonitor());
+			
+			if (projectFacade == null) {
+				return new Profile[0];
+			}
+			
+			// Use reflection to access MavenProject.getModel().getProfiles() without direct API access
+			// This avoids compilation errors from restricted Maven Model API
+			try {
+				final Object mavenProject = projectFacade.getMavenProject(new NullProgressMonitor());
+				if (mavenProject == null) {
+					return new Profile[0];
+				}
+				
+				// Use reflection to call getModel()
+				final java.lang.reflect.Method getModelMethod = mavenProject.getClass().getMethod("getModel");
+				final Object model = getModelMethod.invoke(mavenProject);
+				if (model == null) {
+					return new Profile[0];
+				}
+				
+				// Use reflection to call getProfiles()
+				final java.lang.reflect.Method getProfilesMethod = model.getClass().getMethod("getProfiles");
+				@SuppressWarnings("unchecked")
+				final java.util.List<Object> profiles = (java.util.List<Object>) getProfilesMethod.invoke(model);
+				
+				if (profiles == null || profiles.isEmpty()) {
+					return new Profile[0];
+				}
+				
+				final List<Profile> result = new ArrayList<>();
+				for (Object profileObj : profiles) {
+					// Use reflection to get profile ID
+					final java.lang.reflect.Method getIdMethod = profileObj.getClass().getMethod("getId");
+					final String profileId = (String) getIdMethod.invoke(profileObj);
+					
+					if (profileId == null || profileId.trim().isEmpty()) {
+						continue;
+					}
+					
+					// Use reflection to check if active by default
+					boolean activeByDefault = false;
+					final java.lang.reflect.Method getActivationMethod = profileObj.getClass().getMethod("getActivation");
+					final Object activation = getActivationMethod.invoke(profileObj);
+					if (activation != null) {
+						final java.lang.reflect.Method isActiveByDefaultMethod = activation.getClass().getMethod("isActiveByDefault");
+						activeByDefault = Boolean.TRUE.equals(isActiveByDefaultMethod.invoke(activation));
+					}
+					
+					result.add(new Profile(profileId, activeByDefault));
+				}
+				
+				return result.toArray(new Profile[0]);
+			} catch (NoSuchMethodException | IllegalAccessException | java.lang.reflect.InvocationTargetException e) {
+				// Reflection failed, fall back to XML parsing of local pom.xml
+				return readProfilesFromXml(pomFile);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return new Profile[0];
+	}
+	
+	private static Profile[] readProfilesFromXml(IFile pomFile) {
+		try {
 			if (pomFile == null || !pomFile.exists()) {
 				return new Profile[0];
 			}
 			
-			// Parse pom.xml using DOM parser to avoid restricted Maven API
+			// Parse pom.xml using DOM parser
 			final javax.xml.parsers.DocumentBuilderFactory factory = javax.xml.parsers.DocumentBuilderFactory.newInstance();
 			factory.setNamespaceAware(false);
 			
