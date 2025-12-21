@@ -133,6 +133,17 @@ public class MavenRunner {
 	}
 
 	private static void setProjectConfiguration(ILaunchConfigurationWorkingCopy workingCopy, IContainer basedir) {
+		final IProject project = basedir.getProject();
+		if (project != null) {
+			// First try to get user-selected profiles from ProfileSelectionManager
+			final String[] selectedProfiles = ProfileSelectionManager.getSelectedProfiles(project);
+			if (selectedProfiles != null && selectedProfiles.length > 0) {
+				workingCopy.setAttribute(ATTR_PROFILES, String.join(",", selectedProfiles));
+				return;
+			}
+		}
+		
+		// Fallback to M2E configuration if no user selection
 		final IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
 		final IFile pomFile = basedir.getFile(new Path(POM_FILE_NAME));
 		final IMavenProjectFacade projectFacade = projectManager.create(pomFile, false, new NullProgressMonitor());

@@ -26,6 +26,7 @@ import com.tlcsdm.eclipse.mavenview.internal.DisplayableLabelProvider;
 import com.tlcsdm.eclipse.mavenview.internal.tree.LaunchConfigNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.PhaseNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.PhasesNode;
+import com.tlcsdm.eclipse.mavenview.internal.tree.ProfileNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.ProjectNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.ProjectTreeContentProvider;
 
@@ -72,7 +73,15 @@ public class MavenView extends ViewPart {
 		this.viewer.addDoubleClickListener(event -> {
 			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 			Object selectedElement = selection.getFirstElement();
-			if (selectedElement instanceof PhaseNode || selectedElement instanceof LaunchConfigNode) {
+			if (selectedElement instanceof ProfileNode) {
+				// Toggle profile selection on double-click
+				ProfileNode profileNode = (ProfileNode) selectedElement;
+				profileNode.setSelected(!profileNode.isSelected());
+				// Save the selection state
+				ProfileSelectionManager.saveProfileSelection(profileNode.getProject(), profileNode);
+				// Refresh the node to show updated checkbox state
+				this.viewer.refresh(profileNode);
+			} else if (selectedElement instanceof PhaseNode || selectedElement instanceof LaunchConfigNode) {
 				executeCommand(selectedElement);
 			}
 		});
