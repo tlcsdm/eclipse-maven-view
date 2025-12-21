@@ -10,6 +10,9 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
+import org.eclipse.jface.viewers.CheckboxTreeViewer;
+import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
@@ -27,6 +30,7 @@ import com.tlcsdm.eclipse.mavenview.internal.tree.LaunchConfigNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.PhaseNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.PhasesNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.ProfileNode;
+import com.tlcsdm.eclipse.mavenview.internal.tree.ProfilesNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.ProjectNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.ProjectTreeContentProvider;
 
@@ -37,12 +41,12 @@ public class MavenView extends ViewPart {
 	 */
 	public static final String ID = "com.tlcsdm.eclipse.mavenview.MavenView";
 
-	TreeViewer viewer;
+	CheckboxTreeViewer viewer;
 	private IResourceChangeListener resourceChangeListener;
 
 	@Override
 	public void createPartControl(Composite parent) {
-		this.viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+		this.viewer = new CheckboxTreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 
 		this.viewer.setAutoExpandLevel(AbstractTreeViewer.NO_EXPAND);
 		this.viewer.setLabelProvider(new DisplayableLabelProvider());
@@ -53,10 +57,21 @@ public class MavenView extends ViewPart {
 			public void treeExpanded(TreeExpansionEvent event) {
 				Object element = event.getElement();
 				// Refresh phase nodes to show updated status icons for `test` phase
-				// Refresh profile nodes to show updated selection state
-				if (element instanceof ProjectNode || element instanceof PhasesNode || element instanceof ProfileNode) {
+				if (element instanceof ProjectNode || element instanceof PhasesNode) {
 					Display.getDefault().asyncExec(() -> {
 						viewer.refresh(element, true);
+					});
+				}
+				// Update checkbox states for profile nodes when ProfilesNode is expanded
+				if (element instanceof ProfilesNode) {
+					Display.getDefault().asyncExec(() -> {
+						Object[] profiles = ((ProjectTreeContentProvider) viewer.getContentProvider()).getChildren(element);
+						for (Object profile : profiles) {
+							if (profile instanceof ProfileNode) {
+								ProfileNode profileNode = (ProfileNode) profile;
+								viewer.setChecked(profileNode, profileNode.isSelected());
+							}
+						}
 					});
 				}
 			}
@@ -71,19 +86,16 @@ public class MavenView extends ViewPart {
 		if (inputNodes != null && inputNodes.length == 1) {
 			this.viewer.expandAll();
 		}
-		// Add single-click listener for profile selection toggle
-		this.viewer.getTree().addListener(SWT.MouseDown, event -> {
-			if (event.button == SWT.BUTTON1) { // Left click
-				org.eclipse.swt.graphics.Point point = new org.eclipse.swt.graphics.Point(event.x, event.y);
-				org.eclipse.swt.widgets.TreeItem item = viewer.getTree().getItem(point);
-				if (item != null) {
-					Object data = item.getData();
-					if (data instanceof ProfileNode) {
-						ProfileNode profileNode = (ProfileNode) data;
-						profileNode.setSelected(!profileNode.isSelected());
-						ProfileSelectionManager.saveProfileSelection(profileNode.getProject(), profileNode);
-						viewer.refresh(profileNode);
-					}
+		// Add checkbox state listener for profile selection
+		this.viewer.addCheckStateListener(new ICheckStateListener() {
+			@Override
+			public void checkStateChanged(CheckStateChangedEvent event) {
+				Object element = event.getElement();
+				if (element instanceof ProfileNode) {
+					ProfileNode profileNode = (ProfileNode) element;
+					profileNode.setSelected(event.getChecked());
+					ProfileSelectionManager.saveProfileSelection(profileNode.getProject(), profileNode);
+					// No need to refresh, checkbox state is handled by CheckboxTreeViewer
 				}
 			}
 		});
@@ -106,9 +118,22 @@ public class MavenView extends ViewPart {
 
 	public void refresh() {
 		final Object[] expandedElements = this.viewer.getExpandedElements();
+		// Save checkbox states before refresh
+		java.util.Map<ProfileNode, Boolean> checkStates = new java.util.HashMap<>();
+		for (Object element : this.viewer.getCheckedElements()) {
+			if (element instanceof ProfileNode) {
+				checkStates.put((ProfileNode) element, true);
+			}
+		}
+		
 		this.viewer.setInput(ProjectTreeContentProvider.fetchMavenProjects());
 		this.viewer.setExpandedElements(expandedElements);
 		this.viewer.refresh(true);
+		
+		// Restore checkbox states after refresh
+		for (java.util.Map.Entry<ProfileNode, Boolean> entry : checkStates.entrySet()) {
+			this.viewer.setChecked(entry.getKey(), entry.getValue());
+		}
 	}
 
 	private void executeCommand(Object selectedNode) {

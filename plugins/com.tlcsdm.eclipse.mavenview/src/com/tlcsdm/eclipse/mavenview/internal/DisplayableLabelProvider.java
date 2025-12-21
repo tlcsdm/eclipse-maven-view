@@ -57,9 +57,8 @@ public class DisplayableLabelProvider extends StyledCellLabelProvider {
 			cell.setImage(phaseNode.getImage());
 		} else if (obj instanceof ProfileNode) {
 			ProfileNode profileNode = (ProfileNode) obj;
-			// Show profile with checkbox prefix based on selection state
-			String prefix = profileNode.isSelected() ? "☑ " : "☐ ";
-			cell.setText(prefix + profileNode.getDisplayName());
+			// Use real checkbox, no text prefix needed
+			cell.setText(profileNode.getDisplayName());
 			cell.setFont(getDefaultFont());
 			cell.setImage(profileNode.getImage());
 		} else if (obj instanceof Displayable) {
