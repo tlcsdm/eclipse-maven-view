@@ -26,6 +26,8 @@ import com.tlcsdm.eclipse.mavenview.internal.DisplayableLabelProvider;
 import com.tlcsdm.eclipse.mavenview.internal.tree.LaunchConfigNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.PhaseNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.PhasesNode;
+import com.tlcsdm.eclipse.mavenview.internal.tree.ProfileNode;
+import com.tlcsdm.eclipse.mavenview.internal.tree.ProfilesNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.ProjectNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.ProjectTreeContentProvider;
 
@@ -52,7 +54,8 @@ public class MavenView extends ViewPart {
 			public void treeExpanded(TreeExpansionEvent event) {
 				Object element = event.getElement();
 				// Refresh phase nodes to show updated status icons for `test` phase
-				if (element instanceof ProjectNode || element instanceof PhasesNode) {
+				// Refresh profile nodes to show updated selection state
+				if (element instanceof ProjectNode || element instanceof PhasesNode || element instanceof ProfilesNode) {
 					Display.getDefault().asyncExec(() -> {
 						viewer.refresh(element, true);
 					});
@@ -69,10 +72,29 @@ public class MavenView extends ViewPart {
 		if (inputNodes != null && inputNodes.length == 1) {
 			this.viewer.expandAll();
 		}
+		// Add single-click listener for profile selection toggle
+		this.viewer.getTree().addListener(SWT.MouseDown, event -> {
+			if (event.button == SWT.BUTTON1) { // Left click
+				org.eclipse.swt.graphics.Point point = new org.eclipse.swt.graphics.Point(event.x, event.y);
+				org.eclipse.swt.widgets.TreeItem item = viewer.getTree().getItem(point);
+				if (item != null) {
+					Object data = item.getData();
+					if (data instanceof ProfileNode) {
+						ProfileNode profileNode = (ProfileNode) data;
+						profileNode.setSelected(!profileNode.isSelected());
+						ProfileSelectionManager.saveProfileSelection(profileNode.getProject(), profileNode);
+						viewer.refresh(profileNode);
+					}
+				}
+			}
+		});
 		this.viewer.addDoubleClickListener(event -> {
 			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 			Object selectedElement = selection.getFirstElement();
-			if (selectedElement instanceof PhaseNode || selectedElement instanceof LaunchConfigNode) {
+			if (selectedElement instanceof ProfileNode) {
+				// Already handled by single-click, but we prevent default action
+				// Do nothing to avoid double-toggle
+			} else if (selectedElement instanceof PhaseNode || selectedElement instanceof LaunchConfigNode) {
 				executeCommand(selectedElement);
 			}
 		});

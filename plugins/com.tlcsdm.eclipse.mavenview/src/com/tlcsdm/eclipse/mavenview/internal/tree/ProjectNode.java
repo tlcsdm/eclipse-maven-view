@@ -22,6 +22,8 @@ import org.eclipse.ui.ide.IDE.SharedImages;
 
 import com.tlcsdm.eclipse.mavenview.Displayable;
 import com.tlcsdm.eclipse.mavenview.MavenRunner;
+import com.tlcsdm.eclipse.mavenview.Profile;
+import com.tlcsdm.eclipse.mavenview.ProfileSelectionManager;
 
 public class ProjectNode implements Displayable, Parentable {
 
@@ -85,11 +87,18 @@ public class ProjectNode implements Displayable, Parentable {
 		// configs
 		final List<Object> children = new ArrayList<>();
 
-		// add profiles node if project has selected profiles
-		String[] selectedProfiles = readSelectedProfiles(this.project);
-//		if (selectedProfiles != null && selectedProfiles.length > 0) {
-//			children.add(new ProfilesNode(this, selectedProfiles));
-//		}
+		// add profiles node if project has profiles
+		Profile[] availableProfiles = readAvailableProfiles(this.project);
+		String[] selectedProfiles = ProfileSelectionManager.getSelectedProfiles(this.project);
+		// If no user selection, use profiles active by default
+		if (selectedProfiles.length == 0 && availableProfiles.length > 0) {
+			selectedProfiles = getDefaultSelectedProfiles(availableProfiles);
+			// Initialize ProfileSelectionManager with default selections
+			ProfileSelectionManager.initializeDefaultProfiles(this.project, selectedProfiles);
+		}
+		if (availableProfiles != null && availableProfiles.length > 0) {
+			children.add(new ProfilesNode(this, availableProfiles, selectedProfiles));
+		}
 
 		// phases
 		children.add(new PhasesNode(this));
@@ -120,6 +129,43 @@ public class ProjectNode implements Displayable, Parentable {
 			e.printStackTrace();
 		}
 		return new String[0];
+	}
+
+	private static Profile[] readAvailableProfiles(IProject project) {
+		try {
+			final IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
+			final IFile pomFile = project.getFile(new Path(MavenRunner.POM_FILE_NAME));
+			final IMavenProjectFacade projectFacade = projectManager.create(pomFile, false, new NullProgressMonitor());
+			if (projectFacade != null) {
+				final org.apache.maven.model.Model mavenModel = projectFacade.getMavenProject(new NullProgressMonitor()).getModel();
+				if (mavenModel != null) {
+					final java.util.List<org.apache.maven.model.Profile> profiles = mavenModel.getProfiles();
+					if (profiles != null && !profiles.isEmpty()) {
+						final Profile[] result = new Profile[profiles.size()];
+						for (int i = 0; i < profiles.size(); i++) {
+							final org.apache.maven.model.Profile mavenProfile = profiles.get(i);
+							boolean activeByDefault = mavenProfile.getActivation() != null && 
+													  mavenProfile.getActivation().isActiveByDefault();
+							result[i] = new Profile(mavenProfile.getId(), activeByDefault);
+						}
+						return result;
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return new Profile[0];
+	}
+
+	private static String[] getDefaultSelectedProfiles(Profile[] availableProfiles) {
+		final List<String> result = new ArrayList<>();
+		for (Profile profile : availableProfiles) {
+			if (profile.isActiveByDefault()) {
+				result.add(profile.getId());
+			}
+		}
+		return result.toArray(new String[result.size()]);
 	}
 
 	@Override

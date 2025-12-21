@@ -14,6 +14,7 @@ import com.tlcsdm.eclipse.mavenview.Displayable;
 import com.tlcsdm.eclipse.mavenview.MavenViewPreferences;
 import com.tlcsdm.eclipse.mavenview.Phase;
 import com.tlcsdm.eclipse.mavenview.internal.tree.PhaseNode;
+import com.tlcsdm.eclipse.mavenview.internal.tree.ProfileNode;
 
 public class DisplayableLabelProvider extends StyledCellLabelProvider {
 
@@ -54,6 +55,13 @@ public class DisplayableLabelProvider extends StyledCellLabelProvider {
 				cell.setFont(getDefaultFont());
 			}
 			cell.setImage(phaseNode.getImage());
+		} else if (obj instanceof ProfileNode) {
+			ProfileNode profileNode = (ProfileNode) obj;
+			// Show profile with checkbox prefix based on selection state
+			String prefix = profileNode.isSelected() ? "☑ " : "☐ ";
+			cell.setText(prefix + profileNode.getDisplayName());
+			cell.setFont(getDefaultFont());
+			cell.setImage(profileNode.getImage());
 		} else if (obj instanceof Displayable) {
 			Displayable displayable = (Displayable) obj;
 			cell.setText(displayable.getDisplayName());
