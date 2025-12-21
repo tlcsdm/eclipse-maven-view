@@ -1,5 +1,6 @@
 package com.tlcsdm.eclipse.mavenview.internal.tree;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -20,6 +21,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE.SharedImages;
 
+import com.tlcsdm.eclipse.mavenview.Activator;
 import com.tlcsdm.eclipse.mavenview.Displayable;
 import com.tlcsdm.eclipse.mavenview.MavenRunner;
 import com.tlcsdm.eclipse.mavenview.Profile;
@@ -126,7 +128,8 @@ public class ProjectNode implements Displayable, Parentable {
 			}
 			
 			// Use reflection to access MavenProject.getModel().getProfiles() without direct API access
-			// This avoids compilation errors from restricted Maven Model API
+			// This approach allows accessing Maven model data without adding Maven dependencies 
+			// that might conflict with M2E's embedded Maven version, avoiding access restriction errors
 			try {
 				final Object mavenProject = projectFacade.getMavenProject(new NullProgressMonitor());
 				if (mavenProject == null) {
@@ -172,12 +175,13 @@ public class ProjectNode implements Displayable, Parentable {
 				}
 				
 				return result.toArray(new Profile[0]);
-			} catch (NoSuchMethodException | IllegalAccessException | java.lang.reflect.InvocationTargetException e) {
+			} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
 				// Reflection failed, fall back to XML parsing of local pom.xml
 				return readProfilesFromXml(pomFile);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			Activator.getDefault().getLog()
+				.error("Failed to read Maven profiles for project " + project.getName(), e);
 		}
 		return new Profile[0];
 	}
@@ -261,7 +265,8 @@ public class ProjectNode implements Displayable, Parentable {
 			
 			return result.toArray(new Profile[0]);
 		} catch (Exception e) {
-			e.printStackTrace();
+			Activator.getDefault().getLog()
+				.error("Failed to parse POM XML for profiles", e);
 		}
 		return new Profile[0];
 	}
