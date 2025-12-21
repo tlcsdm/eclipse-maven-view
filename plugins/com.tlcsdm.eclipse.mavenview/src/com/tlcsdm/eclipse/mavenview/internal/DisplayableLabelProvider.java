@@ -57,9 +57,26 @@ public class DisplayableLabelProvider extends StyledCellLabelProvider {
 			cell.setImage(phaseNode.getImage());
 		} else if (obj instanceof ProfileNode) {
 			ProfileNode profileNode = (ProfileNode) obj;
-			// Use real checkbox, no text prefix needed
-			cell.setText(profileNode.getDisplayName());
-			cell.setFont(getDefaultFont());
+			// Show profile with improved visual styling
+			String prefix = profileNode.isSelected() ? "✓ " : "  ";
+			String displayText = prefix + profileNode.getDisplayName();
+			
+			if (profileNode.isSelected()) {
+				// Selected profiles: bold text with blue color
+				TextStyle textStyle = new TextStyle(cell.getFont(), null, null);
+				textStyle.foreground = cell.getControl().getDisplay().getSystemColor(SWT.COLOR_BLUE);
+				StyleRange styleRange = new StyleRange(textStyle);
+				styleRange.start = 0;
+				styleRange.length = displayText.length();
+				styleRange.fontStyle = SWT.BOLD;
+				cell.setText(displayText);
+				cell.setStyleRanges(new StyleRange[] { styleRange });
+			} else {
+				// Unselected profiles: normal text
+				cell.setText(displayText);
+				cell.setFont(getDefaultFont());
+				cell.setStyleRanges(new StyleRange[] {});
+			}
 			cell.setImage(profileNode.getImage());
 		} else if (obj instanceof Displayable) {
 			Displayable displayable = (Displayable) obj;
