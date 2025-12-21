@@ -128,7 +128,7 @@ public class ProjectNode implements Displayable, Parentable {
 			}
 			
 			// Use reflection to access MavenProject.getModel().getProfiles() without direct API access
-			// This approach allows accessing Maven model data without adding Maven dependencies 
+			// This approach allows accessing Maven model data without adding Maven dependencies
 			// that might conflict with M2E's embedded Maven version, avoiding access restriction errors
 			try {
 				final Object mavenProject = projectFacade.getMavenProject(new NullProgressMonitor());
@@ -177,6 +177,9 @@ public class ProjectNode implements Displayable, Parentable {
 				return result.toArray(new Profile[0]);
 			} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
 				// Reflection failed, fall back to XML parsing of local pom.xml
+				Activator.getDefault().getLog()
+					.warn("Maven reflection API access failed for project " + project.getName() + 
+					      ", falling back to XML parsing. This may not include parent POM profiles.", e);
 				return readProfilesFromXml(pomFile);
 			}
 		} catch (Exception e) {
