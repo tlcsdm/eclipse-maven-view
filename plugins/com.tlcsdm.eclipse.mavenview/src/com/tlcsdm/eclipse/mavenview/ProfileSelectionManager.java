@@ -48,6 +48,28 @@ public class ProfileSelectionManager {
 	}
 
 	/**
+	 * Initializes the profile selection manager with default profiles.
+	 * This is called when no user selection exists yet.
+	 */
+	public static void initializeDefaultProfiles(IProject project, String[] defaultProfiles) {
+		String projectName = project.getName();
+		List<String> selectedProfiles = profileSelections.get(projectName);
+		
+		// Only initialize if not already set
+		if (selectedProfiles == null || selectedProfiles.isEmpty()) {
+			selectedProfiles = new ArrayList<>();
+			for (String profile : defaultProfiles) {
+				if (profile != null && !profile.isEmpty()) {
+					selectedProfiles.add(profile);
+				}
+			}
+			profileSelections.put(projectName, selectedProfiles);
+			// Persist to preferences
+			persistProfileSelections(projectName, selectedProfiles);
+		}
+	}
+
+	/**
 	 * Gets the selected profiles for a project.
 	 */
 	public static String[] getSelectedProfiles(IProject project) {

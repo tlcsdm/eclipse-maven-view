@@ -90,9 +90,11 @@ public class ProjectNode implements Displayable, Parentable {
 		// add profiles node if project has profiles
 		Profile[] availableProfiles = readAvailableProfiles(this.project);
 		String[] selectedProfiles = ProfileSelectionManager.getSelectedProfiles(this.project);
-		// If no user selection, use profiles active by default or selected in M2E config
-		if (selectedProfiles.length == 0) {
+		// If no user selection, use profiles active by default
+		if (selectedProfiles.length == 0 && availableProfiles.length > 0) {
 			selectedProfiles = getDefaultSelectedProfiles(availableProfiles);
+			// Initialize ProfileSelectionManager with default selections
+			ProfileSelectionManager.initializeDefaultProfiles(this.project, selectedProfiles);
 		}
 		if (availableProfiles != null && availableProfiles.length > 0) {
 			children.add(new ProfilesNode(this, availableProfiles, selectedProfiles));
