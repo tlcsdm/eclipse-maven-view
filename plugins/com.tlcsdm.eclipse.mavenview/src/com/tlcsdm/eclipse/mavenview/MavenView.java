@@ -74,7 +74,7 @@ public class MavenView extends ViewPart {
 		}
 		// Add single-click listener for profile selection toggle
 		this.viewer.getTree().addListener(SWT.MouseDown, event -> {
-			if (event.button == 1) { // Left click
+			if (event.button == SWT.BUTTON1) { // Left click
 				org.eclipse.swt.graphics.Point point = new org.eclipse.swt.graphics.Point(event.x, event.y);
 				org.eclipse.swt.widgets.TreeItem item = viewer.getTree().getItem(point);
 				if (item != null) {

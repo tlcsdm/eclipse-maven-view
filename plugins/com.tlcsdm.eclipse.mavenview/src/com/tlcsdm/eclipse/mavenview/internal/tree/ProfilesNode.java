@@ -31,7 +31,7 @@ public class ProfilesNode implements Displayable, Parentable {
 
 	@Override
 	public Image getImage() {
-		return Activator.getImage(MavenViewImages.OBJ_PHASES);
+		return Activator.getImage(MavenViewImages.OBJ_PROFILE);
 	}
 
 	@Override

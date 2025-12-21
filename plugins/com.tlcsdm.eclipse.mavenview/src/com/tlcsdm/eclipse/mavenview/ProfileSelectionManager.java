@@ -99,7 +99,7 @@ public class ProfileSelectionManager {
 		try {
 			prefs.flush();
 		} catch (BackingStoreException e) {
-			e.printStackTrace();
+			Activator.getDefault().getLog().error("Failed to save profile selections", e);
 		}
 	}
 
