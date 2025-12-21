@@ -120,12 +120,33 @@ public class ProjectNode implements Displayable, Parentable {
 			// Parse pom.xml using DOM parser to avoid restricted Maven API
 			final javax.xml.parsers.DocumentBuilderFactory factory = javax.xml.parsers.DocumentBuilderFactory.newInstance();
 			factory.setNamespaceAware(false);
+			
 			// Security: Disable external entities to prevent XXE attacks
-			factory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
-			factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-			factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-			factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-			factory.setExpandEntityReferences(false);
+			try {
+				factory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+			} catch (Exception e) {
+				// Feature not supported, continue
+			}
+			try {
+				factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+			} catch (Exception e) {
+				// Feature not supported, continue
+			}
+			try {
+				factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+			} catch (Exception e) {
+				// Feature not supported, continue
+			}
+			try {
+				factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+			} catch (Exception e) {
+				// Feature not supported, continue
+			}
+			try {
+				factory.setExpandEntityReferences(false);
+			} catch (Exception e) {
+				// Feature not supported, continue
+			}
 			
 			final javax.xml.parsers.DocumentBuilder builder = factory.newDocumentBuilder();
 			final org.w3c.dom.Document document = builder.parse(pomFile.getContents());
