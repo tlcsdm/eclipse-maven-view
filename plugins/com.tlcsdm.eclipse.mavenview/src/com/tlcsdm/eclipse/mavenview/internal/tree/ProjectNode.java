@@ -7,15 +7,11 @@ import java.util.Objects;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchManager;
-import org.eclipse.m2e.core.MavenPlugin;
-import org.eclipse.m2e.core.project.IMavenProjectFacade;
-import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE.SharedImages;
@@ -114,44 +110,85 @@ public class ProjectNode implements Displayable, Parentable {
 		return children.toArray(new Object[children.size()]);
 	}
 
-	private static String[] readSelectedProfiles(IProject project) {
-		try {
-			final IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
-			final IFile pomFile = project.getFile(new Path(MavenRunner.POM_FILE_NAME));
-			final IMavenProjectFacade projectFacade = projectManager.create(pomFile, false, new NullProgressMonitor());
-			if (projectFacade != null) {
-				final String selectedProfiles = projectFacade.getConfiguration().getSelectedProfiles();
-				if (selectedProfiles != null && selectedProfiles.length() > 0) {
-					return selectedProfiles.split(",");
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return new String[0];
-	}
-
 	private static Profile[] readAvailableProfiles(IProject project) {
 		try {
-			final IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
 			final IFile pomFile = project.getFile(new Path(MavenRunner.POM_FILE_NAME));
-			final IMavenProjectFacade projectFacade = projectManager.create(pomFile, false, new NullProgressMonitor());
-			if (projectFacade != null) {
-				final org.apache.maven.model.Model mavenModel = projectFacade.getMavenProject(new NullProgressMonitor()).getModel();
-				if (mavenModel != null) {
-					final java.util.List<org.apache.maven.model.Profile> profiles = mavenModel.getProfiles();
-					if (profiles != null && !profiles.isEmpty()) {
-						final Profile[] result = new Profile[profiles.size()];
-						for (int i = 0; i < profiles.size(); i++) {
-							final org.apache.maven.model.Profile mavenProfile = profiles.get(i);
-							boolean activeByDefault = mavenProfile.getActivation() != null && 
-													  mavenProfile.getActivation().isActiveByDefault();
-							result[i] = new Profile(mavenProfile.getId(), activeByDefault);
-						}
-						return result;
+			if (pomFile == null || !pomFile.exists()) {
+				return new Profile[0];
+			}
+			
+			// Parse pom.xml using DOM parser to avoid restricted Maven API
+			final javax.xml.parsers.DocumentBuilderFactory factory = javax.xml.parsers.DocumentBuilderFactory.newInstance();
+			factory.setNamespaceAware(false);
+			
+			// Security: Disable external entities to prevent XXE attacks
+			try {
+				factory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+			} catch (javax.xml.parsers.ParserConfigurationException e) {
+				// Feature not supported, continue
+			}
+			try {
+				factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+			} catch (javax.xml.parsers.ParserConfigurationException e) {
+				// Feature not supported, continue
+			}
+			try {
+				factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+			} catch (javax.xml.parsers.ParserConfigurationException e) {
+				// Feature not supported, continue
+			}
+			try {
+				factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+			} catch (javax.xml.parsers.ParserConfigurationException e) {
+				// Feature not supported, continue
+			}
+			try {
+				factory.setExpandEntityReferences(false);
+			} catch (IllegalArgumentException e) {
+				// Feature not supported, continue
+			}
+			
+			final javax.xml.parsers.DocumentBuilder builder = factory.newDocumentBuilder();
+			final org.w3c.dom.Document document = builder.parse(pomFile.getContents());
+			
+			// Get all profile elements
+			final org.w3c.dom.NodeList profileNodes = document.getElementsByTagName("profile");
+			if (profileNodes.getLength() == 0) {
+				return new Profile[0];
+			}
+			
+			final List<Profile> result = new ArrayList<>();
+			for (int i = 0; i < profileNodes.getLength(); i++) {
+				final org.w3c.dom.Element profileElement = (org.w3c.dom.Element) profileNodes.item(i);
+				
+				// Get profile id
+				final org.w3c.dom.NodeList idNodes = profileElement.getElementsByTagName("id");
+				if (idNodes.getLength() == 0) {
+					continue;
+				}
+				final String profileId = idNodes.item(0).getTextContent().trim();
+				
+				// Skip profiles with empty IDs
+				if (profileId.isEmpty()) {
+					continue;
+				}
+				
+				// Check if profile is active by default
+				boolean activeByDefault = false;
+				final org.w3c.dom.NodeList activationNodes = profileElement.getElementsByTagName("activation");
+				if (activationNodes.getLength() > 0) {
+					final org.w3c.dom.Element activationElement = (org.w3c.dom.Element) activationNodes.item(0);
+					final org.w3c.dom.NodeList activeByDefaultNodes = activationElement.getElementsByTagName("activeByDefault");
+					if (activeByDefaultNodes.getLength() > 0) {
+						final String activeByDefaultValue = activeByDefaultNodes.item(0).getTextContent().trim();
+						activeByDefault = "true".equalsIgnoreCase(activeByDefaultValue);
 					}
 				}
+				
+				result.add(new Profile(profileId, activeByDefault));
 			}
+			
+			return result.toArray(new Profile[0]);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
