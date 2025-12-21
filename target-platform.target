@@ -37,4 +37,5 @@
             <unit id="ch.qos.logback.classic" version="0.0.0"/>
         </location>
     </locations>
+
 </target>
