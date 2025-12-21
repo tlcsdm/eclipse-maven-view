@@ -55,7 +55,7 @@ public class MavenView extends ViewPart {
 				Object element = event.getElement();
 				// Refresh phase nodes to show updated status icons for `test` phase
 				// Refresh profile nodes to show updated selection state
-				if (element instanceof ProjectNode || element instanceof PhasesNode) {
+				if (element instanceof ProjectNode || element instanceof PhasesNode || element instanceof ProfileNode) {
 					Display.getDefault().asyncExec(() -> {
 						viewer.refresh(element, true);
 					});
