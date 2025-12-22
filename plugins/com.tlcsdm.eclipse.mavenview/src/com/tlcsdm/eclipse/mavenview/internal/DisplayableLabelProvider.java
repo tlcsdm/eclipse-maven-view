@@ -58,8 +58,10 @@ public class DisplayableLabelProvider extends StyledCellLabelProvider {
 		} else if (obj instanceof ProfileNode) {
 			ProfileNode profileNode = (ProfileNode) obj;
 			// Show profile with improved visual styling
-			String prefix = profileNode.isSelected() ? "✓ " : "  ";
-			String displayText = prefix + profileNode.getDisplayName();
+			// Use checkmark prefix only for selected profiles to align text with other nodes
+			String displayText = profileNode.isSelected() 
+					? "✓ " + profileNode.getDisplayName() 
+					: profileNode.getDisplayName();
 			
 			if (profileNode.isSelected()) {
 				// Selected profiles: bold text with blue color
@@ -72,7 +74,7 @@ public class DisplayableLabelProvider extends StyledCellLabelProvider {
 				cell.setText(displayText);
 				cell.setStyleRanges(new StyleRange[] { styleRange });
 			} else {
-				// Unselected profiles: normal text
+				// Unselected profiles: normal text, aligned with other child nodes
 				cell.setText(displayText);
 				cell.setFont(getDefaultFont());
 				cell.setStyleRanges(new StyleRange[] {});
