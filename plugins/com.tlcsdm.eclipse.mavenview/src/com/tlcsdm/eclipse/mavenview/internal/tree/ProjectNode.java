@@ -24,7 +24,6 @@ import org.eclipse.ui.ide.IDE.SharedImages;
 import com.tlcsdm.eclipse.mavenview.Activator;
 import com.tlcsdm.eclipse.mavenview.Displayable;
 import com.tlcsdm.eclipse.mavenview.MavenRunner;
-import com.tlcsdm.eclipse.mavenview.Profile;
 import com.tlcsdm.eclipse.mavenview.ProfileSelectionManager;
 
 public class ProjectNode implements Displayable, Parentable {

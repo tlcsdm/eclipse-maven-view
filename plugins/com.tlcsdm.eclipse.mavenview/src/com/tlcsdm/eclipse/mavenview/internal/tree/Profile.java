@@ -1,8 +1,10 @@
-package com.tlcsdm.eclipse.mavenview;
+package com.tlcsdm.eclipse.mavenview.internal.tree;
 
 import java.util.Objects;
 
 import org.eclipse.swt.graphics.Image;
+
+import com.tlcsdm.eclipse.mavenview.Displayable;
 
 /**
  * Represents a Maven profile with its name and active status.
