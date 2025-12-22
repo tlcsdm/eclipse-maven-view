@@ -17,7 +17,7 @@ public class ExpandHandler extends AbstractHandler {
 		if (mavenView != null) {
 			final ISelection selection = HandlerUtil.getCurrentSelection(event);
 			if (selection instanceof IStructuredSelection) {
-				IStructuredSelection structuredSelection = (IStructuredSelection) selection;
+				final IStructuredSelection structuredSelection = (IStructuredSelection) selection;
 				for (Object element : structuredSelection.toList()) {
 					mavenView.expand(element);
 				}
