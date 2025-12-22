@@ -27,6 +27,10 @@
             name="%command.expandAll">
       </command>
       <command
+            id="com.tlcsdm.eclipse.mavenview.commands.expand"
+            name="%command.expand">
+      </command>
+      <command
             id="com.tlcsdm.eclipse.mavenview.commands.collapseAll"
             name="%command.collapseAll">
       </command>
@@ -122,6 +126,10 @@
             commandId="com.tlcsdm.eclipse.mavenview.commands.expandAll">
       </handler>
       <handler
+            class="com.tlcsdm.eclipse.mavenview.internal.handler.ExpandHandler"
+            commandId="com.tlcsdm.eclipse.mavenview.commands.expand">
+      </handler>
+      <handler
             class="com.tlcsdm.eclipse.mavenview.internal.handler.CollapseAllHandler"
             commandId="com.tlcsdm.eclipse.mavenview.commands.collapseAll">
       </handler>
@@ -180,6 +188,10 @@
          <command
                commandId="com.tlcsdm.eclipse.mavenview.commands.runMavenPhases"
                id="runMavenPhases">
+         </command>
+         <command
+               commandId="com.tlcsdm.eclipse.mavenview.commands.expand"
+               id="expand">
          </command>
          <separator
                name="com.tlcsdm.eclipse.mavenview.separator.popup1"

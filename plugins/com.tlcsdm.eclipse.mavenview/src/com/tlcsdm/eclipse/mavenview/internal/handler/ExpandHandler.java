@@ -1,0 +1,29 @@
+package com.tlcsdm.eclipse.mavenview.internal.handler;
+
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.handlers.HandlerUtil;
+
+import com.tlcsdm.eclipse.mavenview.MavenView;
+
+public class ExpandHandler extends AbstractHandler {
+
+	@Override
+	public Object execute(ExecutionEvent event) throws ExecutionException {
+		final MavenView mavenView = RefreshHandler.findMavenView(event);
+		if (mavenView != null) {
+			final ISelection selection = HandlerUtil.getCurrentSelection(event);
+			if (selection instanceof IStructuredSelection) {
+				IStructuredSelection structuredSelection = (IStructuredSelection) selection;
+				for (Object element : structuredSelection.toList()) {
+					mavenView.expand(element);
+				}
+			}
+		}
+		return null;
+	}
+
+}
