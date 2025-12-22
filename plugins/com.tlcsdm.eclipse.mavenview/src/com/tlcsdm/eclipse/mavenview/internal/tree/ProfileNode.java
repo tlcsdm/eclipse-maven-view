@@ -49,9 +49,9 @@ public class ProfileNode implements Displayable {
 	public Image getImage() {
 		// Return different images based on selection state
 		if (this.selected) {
-			return Activator.getImage("icons/profile_checked.png");
+			return Activator.getImage("icons/complete_tsk.png");
 		} else {
-			return Activator.getImage("icons/profile_unchecked.png");
+			return Activator.getImage("icons/incomplete_tsk.png");
 		}
 	}
 
