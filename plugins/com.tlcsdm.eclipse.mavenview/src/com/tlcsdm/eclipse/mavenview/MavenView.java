@@ -73,7 +73,7 @@ public class MavenView extends ViewPart {
 		}
 		// Add single-click listener for profile selection toggle
 		this.viewer.getTree().addListener(SWT.MouseDown, event -> {
-			if (event.button == SWT.BUTTON1) { // Left click
+			if (event.button == 1) { // Left click
 				org.eclipse.swt.graphics.Point point = new org.eclipse.swt.graphics.Point(event.x, event.y);
 				org.eclipse.swt.widgets.TreeItem item = viewer.getTree().getItem(point);
 				if (item != null) {
@@ -82,7 +82,7 @@ public class MavenView extends ViewPart {
 						ProfileNode profileNode = (ProfileNode) data;
 						profileNode.setSelected(!profileNode.isSelected());
 						ProfileSelectionManager.saveProfileSelection(profileNode.getProject(), profileNode);
-						viewer.refresh(profileNode);
+						viewer.refresh(profileNode, true);
 					}
 				}
 			}
@@ -90,10 +90,7 @@ public class MavenView extends ViewPart {
 		this.viewer.addDoubleClickListener(event -> {
 			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 			Object selectedElement = selection.getFirstElement();
-			if (selectedElement instanceof ProfileNode) {
-				// Already handled by single-click, but we prevent default action
-				// Do nothing to avoid double-toggle
-			} else if (selectedElement instanceof PhaseNode || selectedElement instanceof LaunchConfigNode) {
+			if (selectedElement instanceof PhaseNode || selectedElement instanceof LaunchConfigNode) {
 				executeCommand(selectedElement);
 			}
 		});

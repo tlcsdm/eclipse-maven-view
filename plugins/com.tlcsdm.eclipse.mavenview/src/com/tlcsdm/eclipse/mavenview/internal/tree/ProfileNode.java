@@ -5,6 +5,7 @@ import java.util.Objects;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.swt.graphics.Image;
 
+import com.tlcsdm.eclipse.mavenview.Activator;
 import com.tlcsdm.eclipse.mavenview.Displayable;
 import com.tlcsdm.eclipse.mavenview.Profile;
 
@@ -46,7 +47,12 @@ public class ProfileNode implements Displayable {
 
 	@Override
 	public Image getImage() {
-		return this.profile.getImage();
+		// Return different images based on selection state
+		if (this.selected) {
+			return Activator.getImage("icons/complete_tsk.png");
+		} else {
+			return Activator.getImage("icons/incomplete_tsk.png");
+		}
 	}
 
 	@Override

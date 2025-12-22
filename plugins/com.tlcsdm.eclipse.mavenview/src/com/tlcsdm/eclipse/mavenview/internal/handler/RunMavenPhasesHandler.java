@@ -21,6 +21,7 @@ import com.tlcsdm.eclipse.mavenview.MavenRunConfig;
 import com.tlcsdm.eclipse.mavenview.MavenRunner;
 import com.tlcsdm.eclipse.mavenview.MavenRunnerException;
 import com.tlcsdm.eclipse.mavenview.Phase;
+import com.tlcsdm.eclipse.mavenview.ProfileSelectionManager;
 import com.tlcsdm.eclipse.mavenview.internal.Messages;
 import com.tlcsdm.eclipse.mavenview.internal.tree.LaunchConfigNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.PhaseNode;
@@ -61,6 +62,12 @@ public class RunMavenPhasesHandler extends AbstractHandler {
 			try {
 				final MavenRunConfig projectConfig = config.copy();
 				projectConfig.setPhases(project.getValue().stream().map(PhaseNode::getPhase).toArray(Phase[]::new));
+				
+				// Apply selected profiles from ProfileSelectionManager
+				final String[] selectedProfiles = ProfileSelectionManager.getSelectedProfiles(project.getKey());
+				if (selectedProfiles != null && selectedProfiles.length > 0) {
+					projectConfig.setProfiles(selectedProfiles);
+				}
 
 				final MavenRunner runner = new MavenRunner();
 				runner.runForProject(project.getKey(), projectConfig);
