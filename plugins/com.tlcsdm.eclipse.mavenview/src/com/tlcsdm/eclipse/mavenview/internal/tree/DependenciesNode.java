@@ -47,6 +47,15 @@ public class DependenciesNode implements Displayable, Parentable {
 		return readDependencies(project);
 	}
 
+	/**
+	 * Check if the project has any dependencies.
+	 * @param project the project to check
+	 * @return true if the project has dependencies, false otherwise
+	 */
+	public static boolean hasDependencies(IProject project) {
+		return readDependencies(project).length > 0;
+	}
+
 	private static DependencyNode[] readDependencies(IProject project) {
 		try {
 			final IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
