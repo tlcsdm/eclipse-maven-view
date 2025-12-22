@@ -187,7 +187,7 @@ public class MavenView extends ViewPart {
 			this.viewer.getTree().setRedraw(false);
 			try {
 				this.viewer.expandAll();
-				this.viewer.refresh(true);
+				this.viewer.refresh();
 			} finally {
 				this.viewer.getTree().setRedraw(true);
 			}
