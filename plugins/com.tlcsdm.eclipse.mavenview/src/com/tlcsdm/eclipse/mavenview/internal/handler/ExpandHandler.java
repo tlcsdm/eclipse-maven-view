@@ -8,6 +8,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.tlcsdm.eclipse.mavenview.MavenView;
+import com.tlcsdm.eclipse.mavenview.internal.tree.Parentable;
 
 public class ExpandHandler extends AbstractHandler {
 
@@ -19,7 +20,9 @@ public class ExpandHandler extends AbstractHandler {
 			if (selection instanceof IStructuredSelection) {
 				final IStructuredSelection structuredSelection = (IStructuredSelection) selection;
 				for (Object element : structuredSelection.toList()) {
-					mavenView.expand(element);
+					if (element instanceof Parentable) {
+						mavenView.expand(element);
+					}
 				}
 			}
 		}
