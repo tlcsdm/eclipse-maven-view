@@ -13,10 +13,13 @@ import com.tlcsdm.eclipse.mavenview.Activator;
 import com.tlcsdm.eclipse.mavenview.Displayable;
 import com.tlcsdm.eclipse.mavenview.MavenViewPreferences;
 import com.tlcsdm.eclipse.mavenview.Phase;
+import com.tlcsdm.eclipse.mavenview.internal.tree.DependencyNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.PhaseNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.ProfileNode;
 
 public class DisplayableLabelProvider extends StyledCellLabelProvider {
+
+	private static final String TEST_SCOPE_SUFFIX = " (test)";
 
 	private final Font grayFont;
 
@@ -78,6 +81,28 @@ public class DisplayableLabelProvider extends StyledCellLabelProvider {
 				cell.setStyleRanges(new StyleRange[] {});
 			}
 			cell.setImage(profileNode.getImage());
+		} else if (obj instanceof DependencyNode) {
+			DependencyNode dependencyNode = (DependencyNode) obj;
+			String displayName = dependencyNode.getDisplayName();
+			
+			if (dependencyNode.isTestScope()) {
+				// Test scope dependencies: show with gray "(test)" suffix
+				String fullText = displayName + TEST_SCOPE_SUFFIX;
+				cell.setText(fullText);
+				
+				// Style the "(test)" suffix in gray
+				TextStyle grayStyle = new TextStyle(cell.getFont(), null, null);
+				grayStyle.foreground = cell.getControl().getDisplay().getSystemColor(SWT.COLOR_GRAY);
+				StyleRange grayRange = new StyleRange(grayStyle);
+				grayRange.start = displayName.length();
+				grayRange.length = TEST_SCOPE_SUFFIX.length();
+				cell.setStyleRanges(new StyleRange[] { grayRange });
+			} else {
+				cell.setText(displayName);
+				cell.setFont(getDefaultFont());
+				cell.setStyleRanges(new StyleRange[] {});
+			}
+			cell.setImage(dependencyNode.getImage());
 		} else if (obj instanceof Displayable) {
 			Displayable displayable = (Displayable) obj;
 			cell.setText(displayable.getDisplayName());

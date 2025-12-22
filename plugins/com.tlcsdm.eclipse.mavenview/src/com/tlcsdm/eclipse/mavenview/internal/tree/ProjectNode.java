@@ -85,8 +85,8 @@ public class ProjectNode implements Displayable, Parentable {
 
 	@Override
 	public Object[] getChildren() {
-		// Build children dynamically: optionally ProfilesNode, PhasesNode and launch
-		// configs
+		// Build children dynamically: optionally ProfilesNode, PhasesNode, launch
+		// configs and DependenciesNode
 		final List<Object> children = new ArrayList<>();
 
 		// add profiles node if project has profiles
@@ -112,6 +112,9 @@ public class ProjectNode implements Displayable, Parentable {
 		if (this.launchConfigs.length > 0) {
 			children.add(new launchConfigsNode(this, this.launchConfigs));
 		}
+
+		// dependencies - always add as the last node
+		children.add(new DependenciesNode(this));
 
 		return children.toArray(new Object[children.size()]);
 	}
