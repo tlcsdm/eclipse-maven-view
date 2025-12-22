@@ -15,6 +15,7 @@ import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
@@ -182,8 +183,15 @@ public class MavenView extends ViewPart {
 	}
 
 	public void expandAll() {
-		this.viewer.expandAll();
-		this.viewer.refresh(true);
+		BusyIndicator.showWhile(this.viewer.getControl().getDisplay(), () -> {
+			this.viewer.getTree().setRedraw(false);
+			try {
+				this.viewer.expandAll();
+				this.viewer.refresh();
+			} finally {
+				this.viewer.getTree().setRedraw(true);
+			}
+		});
 	}
 
 	public void expand(Object element) {
