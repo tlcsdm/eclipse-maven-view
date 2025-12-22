@@ -57,11 +57,9 @@ public class DisplayableLabelProvider extends StyledCellLabelProvider {
 			cell.setImage(phaseNode.getImage());
 		} else if (obj instanceof ProfileNode) {
 			ProfileNode profileNode = (ProfileNode) obj;
-			// Show profile with improved visual styling
-			// Use checkmark prefix only for selected profiles to align text with other nodes
-			String displayText = profileNode.isSelected() 
-					? "✓ " + profileNode.getDisplayName() 
-					: profileNode.getDisplayName();
+			// Profile nodes now use different icons for checked/unchecked state
+			// No need for text prefix - the icon shows the state
+			String displayText = profileNode.getDisplayName();
 			
 			if (profileNode.isSelected()) {
 				// Selected profiles: bold text with blue color
