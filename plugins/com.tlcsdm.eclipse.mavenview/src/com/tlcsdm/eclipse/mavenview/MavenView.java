@@ -186,6 +186,11 @@ public class MavenView extends ViewPart {
 		this.viewer.refresh(true);
 	}
 
+	public void expand(Object element) {
+		this.viewer.expandToLevel(element, AbstractTreeViewer.ALL_LEVELS);
+		this.viewer.refresh(element, true);
+	}
+
 	@Override
 	public void dispose() {
 		if (resourceChangeListener != null) {
