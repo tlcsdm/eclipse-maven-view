@@ -21,6 +21,7 @@ Fork of [eclipse-maven-view](https://github.com/slothsoft/eclipse-maven-view) on
 - Added `ExpandAll`, `CollapseAll`, `SkipTests`, and `Open maven Settings preferences` commands.
 - Optimize `Run` command conditions and styles.
 - Add view refresh on Project Creation / Renaming / Deletion
+- Add `Profile` view
 
 ## Build
 
