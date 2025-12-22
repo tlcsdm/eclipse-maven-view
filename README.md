@@ -23,6 +23,7 @@ Fork of [eclipse-maven-view](https://github.com/slothsoft/eclipse-maven-view) on
 - Add view refresh on Project Creation / Renaming / Deletion
 - Add `Profile` view
 - Add `Dependencies` view
+- Add `Maven Plugins` view
 
 ## Build
 
