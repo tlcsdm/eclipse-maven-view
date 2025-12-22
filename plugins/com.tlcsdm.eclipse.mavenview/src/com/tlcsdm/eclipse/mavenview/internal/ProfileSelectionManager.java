@@ -1,4 +1,4 @@
-package com.tlcsdm.eclipse.mavenview;
+package com.tlcsdm.eclipse.mavenview.internal;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,6 +10,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.tlcsdm.eclipse.mavenview.Activator;
 import com.tlcsdm.eclipse.mavenview.internal.tree.ProfileNode;
 
 /**
@@ -18,7 +19,7 @@ import com.tlcsdm.eclipse.mavenview.internal.tree.ProfileNode;
 public class ProfileSelectionManager {
 
 	private static final String PROFILES_KEY_PREFIX = "selectedProfiles.";
-	
+
 	// In-memory cache of profile selections per project
 	private static final Map<String, List<String>> profileSelections = new HashMap<>();
 
@@ -28,12 +29,12 @@ public class ProfileSelectionManager {
 	public static void saveProfileSelection(IProject project, ProfileNode profileNode) {
 		String projectName = project.getName();
 		List<String> selectedProfiles = profileSelections.get(projectName);
-		
+
 		if (selectedProfiles == null) {
 			selectedProfiles = new ArrayList<>();
 			profileSelections.put(projectName, selectedProfiles);
 		}
-		
+
 		String profileId = profileNode.getProfile().getId();
 		if (profileNode.isSelected()) {
 			if (!selectedProfiles.contains(profileId)) {
@@ -42,19 +43,19 @@ public class ProfileSelectionManager {
 		} else {
 			selectedProfiles.remove(profileId);
 		}
-		
+
 		// Persist to preferences
 		persistProfileSelections(projectName, selectedProfiles);
 	}
 
 	/**
-	 * Initializes the profile selection manager with default profiles.
-	 * This is called when no user selection exists yet.
+	 * Initializes the profile selection manager with default profiles. This is
+	 * called when no user selection exists yet.
 	 */
 	public static void initializeDefaultProfiles(IProject project, String[] defaultProfiles) {
 		String projectName = project.getName();
 		List<String> selectedProfiles = profileSelections.get(projectName);
-		
+
 		// Only initialize if not already set
 		if (selectedProfiles == null || selectedProfiles.isEmpty()) {
 			selectedProfiles = new ArrayList<>();
@@ -75,27 +76,27 @@ public class ProfileSelectionManager {
 	public static String[] getSelectedProfiles(IProject project) {
 		String projectName = project.getName();
 		List<String> selectedProfiles = profileSelections.get(projectName);
-		
+
 		if (selectedProfiles == null) {
 			// Load from preferences
 			selectedProfiles = loadProfileSelections(projectName);
 			profileSelections.put(projectName, selectedProfiles);
 		}
-		
+
 		return selectedProfiles.toArray(new String[selectedProfiles.size()]);
 	}
 
 	private static void persistProfileSelections(String projectName, List<String> selectedProfiles) {
 		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
 		String key = PROFILES_KEY_PREFIX + projectName;
-		
+
 		if (selectedProfiles == null || selectedProfiles.isEmpty()) {
 			prefs.remove(key);
 		} else {
 			String value = String.join(",", selectedProfiles);
 			prefs.put(key, value);
 		}
-		
+
 		try {
 			prefs.flush();
 		} catch (BackingStoreException e) {
@@ -107,7 +108,7 @@ public class ProfileSelectionManager {
 		IEclipsePreferences prefs = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
 		String key = PROFILES_KEY_PREFIX + projectName;
 		String value = prefs.get(key, "");
-		
+
 		List<String> result = new ArrayList<>();
 		if (value != null && !value.isEmpty()) {
 			String[] profiles = value.split(",");
@@ -117,7 +118,7 @@ public class ProfileSelectionManager {
 				}
 			}
 		}
-		
+
 		return result;
 	}
 }

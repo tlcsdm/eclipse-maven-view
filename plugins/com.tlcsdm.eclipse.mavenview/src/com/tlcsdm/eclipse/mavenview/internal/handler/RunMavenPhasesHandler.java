@@ -21,8 +21,8 @@ import com.tlcsdm.eclipse.mavenview.MavenRunConfig;
 import com.tlcsdm.eclipse.mavenview.MavenRunner;
 import com.tlcsdm.eclipse.mavenview.MavenRunnerException;
 import com.tlcsdm.eclipse.mavenview.Phase;
-import com.tlcsdm.eclipse.mavenview.ProfileSelectionManager;
 import com.tlcsdm.eclipse.mavenview.internal.Messages;
+import com.tlcsdm.eclipse.mavenview.internal.ProfileSelectionManager;
 import com.tlcsdm.eclipse.mavenview.internal.tree.LaunchConfigNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.PhaseNode;
 

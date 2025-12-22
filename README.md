@@ -22,6 +22,7 @@ Fork of [eclipse-maven-view](https://github.com/slothsoft/eclipse-maven-view) on
 - Optimize `Run` command conditions and styles.
 - Add view refresh on Project Creation / Renaming / Deletion
 - Add `Profile` view
+- Add `Dependencies` view
 
 ## Build
 
