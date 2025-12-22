@@ -84,7 +84,7 @@ public class ProjectNode implements Displayable, Parentable {
 
 	@Override
 	public Object[] getChildren() {
-		// Build children dynamically in order: Profiles, Phases, Run Configurations, Dependencies
+		// Build children dynamically in order: Profiles, Phases, Maven Plugins, Run Configurations, Dependencies
 		// Only show nodes that have children (except Phases which is always shown)
 		final List<Object> children = new ArrayList<>();
 
@@ -98,15 +98,16 @@ public class ProjectNode implements Displayable, Parentable {
 			ProfileSelectionManager.initializeDefaultProfiles(this.project, selectedProfiles);
 		}
 		boolean hasProfiles = availableProfiles != null && availableProfiles.length > 0;
+		boolean hasPlugins = MavenPluginsNode.hasPlugins(this.project);
 		boolean hasLaunchConfigs = this.launchConfigs.length > 0;
 		boolean hasDependencies = DependenciesNode.hasDependencies(this.project);
 
-		// If no profiles, launch configs, or dependencies, show phases directly (flat structure)
-		if (!hasProfiles && !hasLaunchConfigs && !hasDependencies) {
+		// If no profiles, plugins, launch configs, or dependencies, show phases directly (flat structure)
+		if (!hasProfiles && !hasPlugins && !hasLaunchConfigs && !hasDependencies) {
 			return PhaseNode.createDisplayed(this);
 		}
 
-		// Add nodes in order: Profiles, Phases, Run Configurations, Dependencies
+		// Add nodes in order: Profiles, Phases, Maven Plugins, Run Configurations, Dependencies
 		// 1. Profiles (only if has profiles)
 		if (hasProfiles) {
 			children.add(new ProfilesNode(this, availableProfiles, selectedProfiles));
@@ -115,12 +116,17 @@ public class ProjectNode implements Displayable, Parentable {
 		// 2. Phases (always shown as a container node when at least one other node type exists)
 		children.add(new PhasesNode(this));
 
-		// 3. Run Configurations (only if has launch configs)
+		// 3. Maven Plugins (only if has plugins)
+		if (hasPlugins) {
+			children.add(new MavenPluginsNode(this));
+		}
+
+		// 4. Run Configurations (only if has launch configs)
 		if (hasLaunchConfigs) {
 			children.add(new launchConfigsNode(this, this.launchConfigs));
 		}
 
-		// 4. Dependencies (only if has dependencies)
+		// 5. Dependencies (only if has dependencies)
 		if (hasDependencies) {
 			children.add(new DependenciesNode(this));
 		}

@@ -20,12 +20,18 @@ public class MavenViewAdapterFactory implements IAdapterFactory {
 				return (T) firstElement;
 			}
 		}
+		if (adapterType == MavenPluginGoalNode.class && adaptableObject instanceof IStructuredSelection) {
+			Object firstElement = ((IStructuredSelection) adaptableObject).getFirstElement();
+			if (firstElement instanceof MavenPluginGoalNode) {
+				return (T) firstElement;
+			}
+		}
 
 		return null;
 	}
 
 	@Override
 	public Class<?>[] getAdapterList() {
-		return new Class[] { PhaseNode.class, LaunchConfigNode.class };
+		return new Class[] { PhaseNode.class, LaunchConfigNode.class, MavenPluginGoalNode.class };
 	}
 }

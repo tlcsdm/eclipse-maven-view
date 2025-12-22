@@ -24,6 +24,7 @@ import com.tlcsdm.eclipse.mavenview.Phase;
 import com.tlcsdm.eclipse.mavenview.internal.Messages;
 import com.tlcsdm.eclipse.mavenview.internal.ProfileSelectionManager;
 import com.tlcsdm.eclipse.mavenview.internal.tree.LaunchConfigNode;
+import com.tlcsdm.eclipse.mavenview.internal.tree.MavenPluginGoalNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.PhaseNode;
 
 public class RunMavenPhasesHandler extends AbstractHandler {
@@ -40,14 +41,19 @@ public class RunMavenPhasesHandler extends AbstractHandler {
 				? Arrays.stream(((IStructuredSelection) selection).toArray()).filter(s -> s instanceof LaunchConfigNode)
 						.map(s -> (LaunchConfigNode) s).toArray(LaunchConfigNode[]::new)
 				: new LaunchConfigNode[0];
+		final MavenPluginGoalNode[] selectedPluginGoalNodes = selection instanceof IStructuredSelection
+				? Arrays.stream(((IStructuredSelection) selection).toArray()).filter(s -> s instanceof MavenPluginGoalNode)
+						.map(s -> (MavenPluginGoalNode) s).toArray(MavenPluginGoalNode[]::new)
+				: new MavenPluginGoalNode[0];
 
 		final Shell activeShell = HandlerUtil.getActiveShell(event);
-		if (selectedPhaseNodes.length == 0 && selectedLaunchConfigNodes.length == 0) {
+		if (selectedPhaseNodes.length == 0 && selectedLaunchConfigNodes.length == 0 && selectedPluginGoalNodes.length == 0) {
 			MessageDialog.openError(activeShell, Messages.getString("SelectPhasesTitle"),
 					Messages.getString("SelectPhases"));
 		} else {
 			runMavenPhases(activeShell, selectedPhaseNodes);
 			runLaunchConfigs(selectedLaunchConfigNodes);
+			runPluginGoals(activeShell, selectedPluginGoalNodes);
 		}
 		return null;
 	}
@@ -80,6 +86,23 @@ public class RunMavenPhasesHandler extends AbstractHandler {
 	private static void runLaunchConfigs(LaunchConfigNode[] launchConfigNodes) {
 		for (final LaunchConfigNode launchConfigNode : launchConfigNodes) {
 			DebugUITools.launch(launchConfigNode.getLaunchConfig(), "run");
+		}
+	}
+
+	private static void runPluginGoals(Shell shell, MavenPluginGoalNode[] pluginGoalNodes) {
+		final Map<IProject, List<MavenPluginGoalNode>> projects = Arrays.stream(pluginGoalNodes)
+				.collect(Collectors.groupingBy(MavenPluginGoalNode::getProject));
+
+		for (final Entry<IProject, List<MavenPluginGoalNode>> project : projects.entrySet()) {
+			try {
+				// Each plugin goal is run separately
+				for (MavenPluginGoalNode goalNode : project.getValue()) {
+					final MavenRunner runner = new MavenRunner();
+					runner.runGoalForProject(project.getKey(), goalNode.getGoalCommand());
+				}
+			} catch (final MavenRunnerException e) {
+				MessageDialog.openError(shell, Messages.getString("ErrorWhileRunningMaven"), e.getLocalizedMessage());
+			}
 		}
 	}
 }

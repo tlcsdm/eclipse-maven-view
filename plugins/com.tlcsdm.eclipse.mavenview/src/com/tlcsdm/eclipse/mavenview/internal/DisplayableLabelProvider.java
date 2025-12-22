@@ -14,6 +14,7 @@ import com.tlcsdm.eclipse.mavenview.Displayable;
 import com.tlcsdm.eclipse.mavenview.MavenViewPreferences;
 import com.tlcsdm.eclipse.mavenview.Phase;
 import com.tlcsdm.eclipse.mavenview.internal.tree.DependencyNode;
+import com.tlcsdm.eclipse.mavenview.internal.tree.MavenPluginNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.PhaseNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.ProfileNode;
 
@@ -103,6 +104,21 @@ public class DisplayableLabelProvider extends StyledCellLabelProvider {
 				cell.setStyleRanges(new StyleRange[] {});
 			}
 			cell.setImage(dependencyNode.getImage());
+		} else if (obj instanceof MavenPluginNode) {
+			MavenPluginNode pluginNode = (MavenPluginNode) obj;
+			String displayName = pluginNode.getDisplayName();
+			String coordinates = " " + pluginNode.getCoordinates();
+			String fullText = displayName + coordinates;
+			cell.setText(fullText);
+			
+			// Style the coordinates suffix in gray
+			TextStyle grayStyle = new TextStyle(cell.getFont(), null, null);
+			grayStyle.foreground = cell.getControl().getDisplay().getSystemColor(SWT.COLOR_GRAY);
+			StyleRange grayRange = new StyleRange(grayStyle);
+			grayRange.start = displayName.length();
+			grayRange.length = coordinates.length();
+			cell.setStyleRanges(new StyleRange[] { grayRange });
+			cell.setImage(pluginNode.getImage());
 		} else if (obj instanceof Displayable) {
 			Displayable displayable = (Displayable) obj;
 			cell.setText(displayable.getDisplayName());
