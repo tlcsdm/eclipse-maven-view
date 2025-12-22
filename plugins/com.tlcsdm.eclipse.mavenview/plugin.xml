@@ -70,6 +70,10 @@
             icon="icons/expandall.png">
       </image>
       <image
+            commandId="com.tlcsdm.eclipse.mavenview.commands.expand"
+            icon="icons/expandall.png">
+      </image>
+      <image
             commandId="com.tlcsdm.eclipse.mavenview.commands.collapseAll"
             icon="icons/collapseall.png">
       </image>
