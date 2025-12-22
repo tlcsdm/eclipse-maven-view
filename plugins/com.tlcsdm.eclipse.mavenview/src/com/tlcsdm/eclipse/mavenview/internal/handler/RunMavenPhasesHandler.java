@@ -93,11 +93,11 @@ public class RunMavenPhasesHandler extends AbstractHandler {
 		final Map<IProject, List<MavenPluginGoalNode>> projects = Arrays.stream(pluginGoalNodes)
 				.collect(Collectors.groupingBy(MavenPluginGoalNode::getProject));
 
+		final MavenRunner runner = new MavenRunner();
 		for (final Entry<IProject, List<MavenPluginGoalNode>> project : projects.entrySet()) {
 			try {
 				// Each plugin goal is run separately
 				for (MavenPluginGoalNode goalNode : project.getValue()) {
-					final MavenRunner runner = new MavenRunner();
 					runner.runGoalForProject(project.getKey(), goalNode.getGoalCommand());
 				}
 			} catch (final MavenRunnerException e) {

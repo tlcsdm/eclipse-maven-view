@@ -194,13 +194,18 @@ public class MavenPluginsNode implements Displayable, Parentable {
 			for (int b = 0; b < buildNodes.getLength(); b++) {
 				final org.w3c.dom.Element buildElement = (org.w3c.dom.Element) buildNodes.item(b);
 				
-				// Only process direct child <plugins> element
+				// Only process direct child <plugins> element, not those under pluginManagement
 				final org.w3c.dom.NodeList pluginsNodes = buildElement.getElementsByTagName("plugins");
 				for (int p = 0; p < pluginsNodes.getLength(); p++) {
 					final org.w3c.dom.Element pluginsElement = (org.w3c.dom.Element) pluginsNodes.item(p);
 					
-					// Skip if this is under pluginManagement
-					if (pluginsElement.getParentNode() != buildElement) {
+					// Skip if this is under pluginManagement (check if parent is pluginManagement)
+					org.w3c.dom.Node parentNode = pluginsElement.getParentNode();
+					if (parentNode != null && "pluginManagement".equals(parentNode.getNodeName())) {
+						continue;
+					}
+					// Also skip if parent is not the build element (nested plugins)
+					if (parentNode != buildElement) {
 						continue;
 					}
 					
