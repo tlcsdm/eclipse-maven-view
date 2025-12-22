@@ -24,8 +24,7 @@ import org.eclipse.ui.ide.IDE.SharedImages;
 import com.tlcsdm.eclipse.mavenview.Activator;
 import com.tlcsdm.eclipse.mavenview.Displayable;
 import com.tlcsdm.eclipse.mavenview.MavenRunner;
-import com.tlcsdm.eclipse.mavenview.Profile;
-import com.tlcsdm.eclipse.mavenview.ProfileSelectionManager;
+import com.tlcsdm.eclipse.mavenview.internal.ProfileSelectionManager;
 
 public class ProjectNode implements Displayable, Parentable {
 
@@ -85,11 +84,11 @@ public class ProjectNode implements Displayable, Parentable {
 
 	@Override
 	public Object[] getChildren() {
-		// Build children dynamically: optionally ProfilesNode, PhasesNode and launch
-		// configs
+		// Build children dynamically in order: Profiles, Phases, Run Configurations, Dependencies
+		// Only show nodes that have children (except Phases which is always shown)
 		final List<Object> children = new ArrayList<>();
 
-		// add profiles node if project has profiles
+		// Check if project has profiles
 		Profile[] availableProfiles = readAvailableProfiles(this.project);
 		String[] selectedProfiles = ProfileSelectionManager.getSelectedProfiles(this.project);
 		// If no user selection, use profiles active by default
@@ -98,19 +97,32 @@ public class ProjectNode implements Displayable, Parentable {
 			// Initialize ProfileSelectionManager with default selections
 			ProfileSelectionManager.initializeDefaultProfiles(this.project, selectedProfiles);
 		}
-		if (availableProfiles != null && availableProfiles.length > 0) {
+		boolean hasProfiles = availableProfiles != null && availableProfiles.length > 0;
+		boolean hasLaunchConfigs = this.launchConfigs.length > 0;
+		boolean hasDependencies = DependenciesNode.hasDependencies(this.project);
+
+		// If no profiles, launch configs, or dependencies, show phases directly (flat structure)
+		if (!hasProfiles && !hasLaunchConfigs && !hasDependencies) {
+			return PhaseNode.createDisplayed(this);
+		}
+
+		// Add nodes in order: Profiles, Phases, Run Configurations, Dependencies
+		// 1. Profiles (only if has profiles)
+		if (hasProfiles) {
 			children.add(new ProfilesNode(this, availableProfiles, selectedProfiles));
 		}
 
-		// phases
-		if (children.isEmpty() && this.launchConfigs.length == 0) {
-			return PhaseNode.createDisplayed(this);
-		} else {
-			children.add(new PhasesNode(this));
-		}
-		// launch configs
-		if (this.launchConfigs.length > 0) {
+		// 2. Phases (always shown as a container node when at least one other node type exists)
+		children.add(new PhasesNode(this));
+
+		// 3. Run Configurations (only if has launch configs)
+		if (hasLaunchConfigs) {
 			children.add(new launchConfigsNode(this, this.launchConfigs));
+		}
+
+		// 4. Dependencies (only if has dependencies)
+		if (hasDependencies) {
+			children.add(new DependenciesNode(this));
 		}
 
 		return children.toArray(new Object[children.size()]);

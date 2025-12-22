@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Automatic-Module-Name: com.tlcsdm.eclipse.mavenview
 Bundle-Name: %pluginName
 Bundle-SymbolicName: com.tlcsdm.eclipse.mavenview;singleton:=true
-Bundle-Version: 1.0.1.qualifier
+Bundle-Version: 1.0.2.qualifier
 Bundle-Activator: com.tlcsdm.eclipse.mavenview.Activator
 Bundle-Vendor: %providerName
 Require-Bundle: org.eclipse.core.resources,

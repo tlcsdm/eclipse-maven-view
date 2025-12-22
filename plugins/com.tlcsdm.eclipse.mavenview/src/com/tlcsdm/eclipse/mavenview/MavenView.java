@@ -23,6 +23,7 @@ import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.ViewPart;
 
 import com.tlcsdm.eclipse.mavenview.internal.DisplayableLabelProvider;
+import com.tlcsdm.eclipse.mavenview.internal.ProfileSelectionManager;
 import com.tlcsdm.eclipse.mavenview.internal.tree.LaunchConfigNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.PhaseNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.PhasesNode;

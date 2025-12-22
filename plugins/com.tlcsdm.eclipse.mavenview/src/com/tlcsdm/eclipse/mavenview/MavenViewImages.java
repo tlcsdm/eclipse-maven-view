@@ -9,6 +9,8 @@ public final class MavenViewImages {
 	public static final String OBJ_PHASE_CLEAN = "icons/phase_clean.png";
 	public static final String OBJ_PHASE_SITE = "icons/phase_site.png";
 	public static final String OBJ_PHASES = "icons/phases.png";
+	public static final String OBJ_DEPENDENCIES = "icons/dependency.png";
+	public static final String OBJ_DEPENDENCY = "icons/data.png";
 
 	private MavenViewImages() {
 		// not needed

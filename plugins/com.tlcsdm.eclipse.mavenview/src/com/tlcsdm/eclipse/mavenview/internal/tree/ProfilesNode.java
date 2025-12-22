@@ -7,7 +7,6 @@ import org.eclipse.swt.graphics.Image;
 import com.tlcsdm.eclipse.mavenview.Activator;
 import com.tlcsdm.eclipse.mavenview.Displayable;
 import com.tlcsdm.eclipse.mavenview.MavenViewImages;
-import com.tlcsdm.eclipse.mavenview.Profile;
 
 /**
  * Represents the "Profiles" node in the tree view that contains all profile children.

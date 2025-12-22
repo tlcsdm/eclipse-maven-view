@@ -30,6 +30,8 @@ import org.eclipse.m2e.core.project.IMavenProjectFacade;
 import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.m2e.core.project.IProjectConfiguration;
 
+import com.tlcsdm.eclipse.mavenview.internal.ProfileSelectionManager;
+
 /**
  * This class is able to run a Maven process pretty similarly to how M2E does
  * it. Heavily inspired by <code>org.eclipse.m2e.actions.ExecutePomAction</code>

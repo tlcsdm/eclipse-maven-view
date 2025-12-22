@@ -7,7 +7,6 @@ import org.eclipse.swt.graphics.Image;
 
 import com.tlcsdm.eclipse.mavenview.Activator;
 import com.tlcsdm.eclipse.mavenview.Displayable;
-import com.tlcsdm.eclipse.mavenview.Profile;
 
 /**
  * Represents a Maven profile node in the tree view.
