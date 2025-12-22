@@ -90,6 +90,7 @@
          class="com.tlcsdm.eclipse.mavenview.internal.tree.MavenViewAdapterFactory">
         <adapter type="com.tlcsdm.eclipse.mavenview.internal.tree.PhaseNode"/>
         <adapter type="com.tlcsdm.eclipse.mavenview.internal.tree.LaunchConfigNode"/>
+        <adapter type="com.tlcsdm.eclipse.mavenview.internal.tree.MavenPluginGoalNode"/>
       </factory>
    </extension>
    
@@ -103,6 +104,7 @@
                     <or>
                         <instanceof value="com.tlcsdm.eclipse.mavenview.internal.tree.PhaseNode"/>
                         <instanceof value="com.tlcsdm.eclipse.mavenview.internal.tree.LaunchConfigNode"/>
+                        <instanceof value="com.tlcsdm.eclipse.mavenview.internal.tree.MavenPluginGoalNode"/>
                     </or>
                 </iterate>
             </enabledWhen>

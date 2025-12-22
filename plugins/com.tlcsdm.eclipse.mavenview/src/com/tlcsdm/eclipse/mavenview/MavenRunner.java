@@ -81,6 +81,29 @@ public class MavenRunner {
 		}
 	}
 
+	/**
+	 * Run a specific Maven goal (plugin:goal format) for the given project.
+	 * @param project the project to run the goal for
+	 * @param goalCommand the goal command in plugin:goal format (e.g., "clean:clean", "compiler:compile")
+	 * @throws MavenRunnerException if execution fails
+	 */
+	public void runGoalForProject(IProject project, String goalCommand) throws MavenRunnerException {
+		Objects.requireNonNull(project, "Define the project to run from!");
+		Objects.requireNonNull(goalCommand, "Define the goal to run!");
+
+		final IContainer baseDir = project;
+
+		try {
+			final ILaunchConfiguration launchConfiguration = createGoalLaunchConfiguration(baseDir, goalCommand);
+			if (launchConfiguration != null) {
+				DebugUITools.launch(launchConfiguration, this.mode);
+			}
+		} catch (final CoreException e) {
+			throw new MavenRunnerException(MessageFormat.format(Messages.getString("CannotExecuteOnProjectPattern"),
+					project.getName(), goalCommand), e);
+		}
+	}
+
 	private ILaunchConfiguration findOrCreateLaunchConfiguration(IContainer baseDir, MavenRunConfig config)
 			throws CoreException {
 		final List<ILaunchConfiguration> existingConfigs = findExistingLaunchConfigurations(config);
@@ -122,6 +145,37 @@ public class MavenRunner {
 		boolean skipTests = Activator.getDefault().getPreferenceStore().getBoolean(MavenViewPreferences.SKIP_TESTS);
 		workingCopy.setAttribute(MavenRunner.ATTR_SKIP_TESTS, skipTests);
 		workingCopy.setAttribute(ATTR_CONFIG, config);
+
+		setProjectConfiguration(workingCopy, basedir);
+
+		final IPath path = getJreContainerPath(basedir);
+		if (path != null) {
+			workingCopy.setAttribute(IJavaLaunchConfigurationConstants.ATTR_JRE_CONTAINER_PATH,
+					path.toPortableString());
+		}
+
+		return workingCopy;
+	}
+
+	/**
+	 * Create a launch configuration for running a specific Maven plugin goal.
+	 */
+	private ILaunchConfiguration createGoalLaunchConfiguration(IContainer basedir, String goalCommand)
+			throws CoreException {
+
+		final String rawConfigName = MessageFormat.format(Messages.getString("ExecutingInPathPattern"), goalCommand,
+				basedir.getLocation().toString());
+		final String safeConfigName = this.launchManager.generateLaunchConfigurationName(rawConfigName);
+
+		final ILaunchConfigurationWorkingCopy workingCopy = this.launchConfigurationType.newInstance(null,
+				safeConfigName);
+		workingCopy.setAttribute(ATTR_WORKING_DIRECTORY, basedir.getLocation().toOSString());
+		workingCopy.setAttribute(MavenRunner.ATTR_GOALS, goalCommand);
+		workingCopy.setAttribute(IDebugUIConstants.ATTR_PRIVATE, true);
+		workingCopy.setAttribute(RefreshTab.ATTR_REFRESH_SCOPE, "${project}"); //$NON-NLS-1$
+		workingCopy.setAttribute(RefreshTab.ATTR_REFRESH_RECURSIVE, true);
+		boolean skipTests = Activator.getDefault().getPreferenceStore().getBoolean(MavenViewPreferences.SKIP_TESTS);
+		workingCopy.setAttribute(MavenRunner.ATTR_SKIP_TESTS, skipTests);
 
 		setProjectConfiguration(workingCopy, basedir);
 

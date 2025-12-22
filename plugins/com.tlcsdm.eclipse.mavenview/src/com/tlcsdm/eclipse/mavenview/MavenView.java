@@ -25,6 +25,7 @@ import org.eclipse.ui.part.ViewPart;
 import com.tlcsdm.eclipse.mavenview.internal.DisplayableLabelProvider;
 import com.tlcsdm.eclipse.mavenview.internal.ProfileSelectionManager;
 import com.tlcsdm.eclipse.mavenview.internal.tree.LaunchConfigNode;
+import com.tlcsdm.eclipse.mavenview.internal.tree.MavenPluginGoalNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.PhaseNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.PhasesNode;
 import com.tlcsdm.eclipse.mavenview.internal.tree.ProfileNode;
@@ -91,7 +92,8 @@ public class MavenView extends ViewPart {
 		this.viewer.addDoubleClickListener(event -> {
 			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 			Object selectedElement = selection.getFirstElement();
-			if (selectedElement instanceof PhaseNode || selectedElement instanceof LaunchConfigNode) {
+			if (selectedElement instanceof PhaseNode || selectedElement instanceof LaunchConfigNode
+					|| selectedElement instanceof MavenPluginGoalNode) {
 				executeCommand(selectedElement);
 			}
 		});
