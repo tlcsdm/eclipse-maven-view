@@ -1,21 +1,31 @@
 package com.tlcsdm.eclipse.mavenview.internal.tree;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.m2e.core.MavenPlugin;
+import org.eclipse.m2e.core.project.IMavenProjectFacade;
+import org.eclipse.m2e.core.project.IMavenProjectRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE.SharedImages;
 
+import com.tlcsdm.eclipse.mavenview.Activator;
 import com.tlcsdm.eclipse.mavenview.Displayable;
 import com.tlcsdm.eclipse.mavenview.MavenRunner;
+import com.tlcsdm.eclipse.mavenview.Profile;
+import com.tlcsdm.eclipse.mavenview.ProfileSelectionManager;
 
 public class ProjectNode implements Displayable, Parentable {
 
@@ -75,13 +85,210 @@ public class ProjectNode implements Displayable, Parentable {
 
 	@Override
 	public Object[] getChildren() {
-		if (this.launchConfigs.length > 0) {
-			final Object[] children = new Object[2];
-			children[0] = new PhasesNode(this);
-			children[1] = new launchConfigsNode(this, this.launchConfigs);
-			return children;
+		// Build children dynamically: optionally ProfilesNode, PhasesNode and launch
+		// configs
+		final List<Object> children = new ArrayList<>();
+
+		// add profiles node if project has profiles
+		Profile[] availableProfiles = readAvailableProfiles(this.project);
+		String[] selectedProfiles = ProfileSelectionManager.getSelectedProfiles(this.project);
+		// If no user selection, use profiles active by default
+		if (selectedProfiles.length == 0 && availableProfiles.length > 0) {
+			selectedProfiles = getDefaultSelectedProfiles(availableProfiles);
+			// Initialize ProfileSelectionManager with default selections
+			ProfileSelectionManager.initializeDefaultProfiles(this.project, selectedProfiles);
 		}
-		return PhaseNode.createDisplayed(this);
+		if (availableProfiles != null && availableProfiles.length > 0) {
+			children.add(new ProfilesNode(this, availableProfiles, selectedProfiles));
+		}
+
+		// phases
+		if (children.isEmpty() && this.launchConfigs.length == 0) {
+			return PhaseNode.createDisplayed(this);
+		} else {
+			children.add(new PhasesNode(this));
+		}
+		// launch configs
+		if (this.launchConfigs.length > 0) {
+			children.add(new launchConfigsNode(this, this.launchConfigs));
+		}
+
+		return children.toArray(new Object[children.size()]);
+	}
+
+	private static Profile[] readAvailableProfiles(IProject project) {
+		try {
+			// Use M2E to get the Maven project facade which includes effective model
+			final IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
+			final IFile pomFile = project.getFile(new Path(MavenRunner.POM_FILE_NAME));
+			final IMavenProjectFacade projectFacade = projectManager.create(pomFile, false, new NullProgressMonitor());
+
+			if (projectFacade == null) {
+				return new Profile[0];
+			}
+
+			// Use reflection to access MavenProject.getModel().getProfiles() without direct
+			// API access
+			// This approach allows accessing Maven model data without adding Maven
+			// dependencies
+			// that might conflict with M2E's embedded Maven version, avoiding access
+			// restriction errors
+			try {
+				final Object mavenProject = projectFacade.getMavenProject(new NullProgressMonitor());
+				if (mavenProject == null) {
+					return new Profile[0];
+				}
+
+				// Use reflection to call getModel()
+				final java.lang.reflect.Method getModelMethod = mavenProject.getClass().getMethod("getModel");
+				final Object model = getModelMethod.invoke(mavenProject);
+				if (model == null) {
+					return new Profile[0];
+				}
+
+				// Use reflection to call getProfiles()
+				final java.lang.reflect.Method getProfilesMethod = model.getClass().getMethod("getProfiles");
+				@SuppressWarnings("unchecked")
+				final java.util.List<Object> profiles = (java.util.List<Object>) getProfilesMethod.invoke(model);
+
+				if (profiles == null || profiles.isEmpty()) {
+					return new Profile[0];
+				}
+
+				final List<Profile> result = new ArrayList<>();
+				for (Object profileObj : profiles) {
+					// Use reflection to get profile ID
+					final java.lang.reflect.Method getIdMethod = profileObj.getClass().getMethod("getId");
+					final String profileId = (String) getIdMethod.invoke(profileObj);
+
+					if (profileId == null || profileId.trim().isEmpty()) {
+						continue;
+					}
+
+					// Use reflection to check if active by default
+					boolean activeByDefault = false;
+					final java.lang.reflect.Method getActivationMethod = profileObj.getClass()
+							.getMethod("getActivation");
+					final Object activation = getActivationMethod.invoke(profileObj);
+					if (activation != null) {
+						final java.lang.reflect.Method isActiveByDefaultMethod = activation.getClass()
+								.getMethod("isActiveByDefault");
+						activeByDefault = Boolean.TRUE.equals(isActiveByDefaultMethod.invoke(activation));
+					}
+
+					result.add(new Profile(profileId, activeByDefault));
+				}
+
+				return result.toArray(new Profile[0]);
+			} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+				// Reflection failed, fall back to XML parsing of local pom.xml
+				Activator
+						.getDefault().getLog().warn(
+								"Maven reflection API access failed for project " + project.getName()
+										+ ", falling back to XML parsing. This may not include parent POM profiles.",
+								e);
+				return readProfilesFromXml(pomFile);
+			}
+		} catch (Exception e) {
+			Activator.getDefault().getLog().error("Failed to read Maven profiles for project " + project.getName(), e);
+		}
+		return new Profile[0];
+	}
+
+	private static Profile[] readProfilesFromXml(IFile pomFile) {
+		try {
+			if (pomFile == null || !pomFile.exists()) {
+				return new Profile[0];
+			}
+
+			// Parse pom.xml using DOM parser
+			final javax.xml.parsers.DocumentBuilderFactory factory = javax.xml.parsers.DocumentBuilderFactory
+					.newInstance();
+			factory.setNamespaceAware(false);
+
+			// Security: Disable external entities to prevent XXE attacks
+			try {
+				factory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
+			} catch (javax.xml.parsers.ParserConfigurationException e) {
+				// Feature not supported, continue
+			}
+			try {
+				factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+			} catch (javax.xml.parsers.ParserConfigurationException e) {
+				// Feature not supported, continue
+			}
+			try {
+				factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+			} catch (javax.xml.parsers.ParserConfigurationException e) {
+				// Feature not supported, continue
+			}
+			try {
+				factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+			} catch (javax.xml.parsers.ParserConfigurationException e) {
+				// Feature not supported, continue
+			}
+			try {
+				factory.setExpandEntityReferences(false);
+			} catch (IllegalArgumentException e) {
+				// Feature not supported, continue
+			}
+
+			final javax.xml.parsers.DocumentBuilder builder = factory.newDocumentBuilder();
+			final org.w3c.dom.Document document = builder.parse(pomFile.getContents());
+
+			// Get all profile elements
+			final org.w3c.dom.NodeList profileNodes = document.getElementsByTagName("profile");
+			if (profileNodes.getLength() == 0) {
+				return new Profile[0];
+			}
+
+			final List<Profile> result = new ArrayList<>();
+			for (int i = 0; i < profileNodes.getLength(); i++) {
+				final org.w3c.dom.Element profileElement = (org.w3c.dom.Element) profileNodes.item(i);
+
+				// Get profile id
+				final org.w3c.dom.NodeList idNodes = profileElement.getElementsByTagName("id");
+				if (idNodes.getLength() == 0) {
+					continue;
+				}
+				final String profileId = idNodes.item(0).getTextContent().trim();
+
+				// Skip profiles with empty IDs
+				if (profileId.isEmpty()) {
+					continue;
+				}
+
+				// Check if profile is active by default
+				boolean activeByDefault = false;
+				final org.w3c.dom.NodeList activationNodes = profileElement.getElementsByTagName("activation");
+				if (activationNodes.getLength() > 0) {
+					final org.w3c.dom.Element activationElement = (org.w3c.dom.Element) activationNodes.item(0);
+					final org.w3c.dom.NodeList activeByDefaultNodes = activationElement
+							.getElementsByTagName("activeByDefault");
+					if (activeByDefaultNodes.getLength() > 0) {
+						final String activeByDefaultValue = activeByDefaultNodes.item(0).getTextContent().trim();
+						activeByDefault = "true".equalsIgnoreCase(activeByDefaultValue);
+					}
+				}
+
+				result.add(new Profile(profileId, activeByDefault));
+			}
+
+			return result.toArray(new Profile[0]);
+		} catch (Exception e) {
+			Activator.getDefault().getLog().error("Failed to parse POM XML for profiles", e);
+		}
+		return new Profile[0];
+	}
+
+	private static String[] getDefaultSelectedProfiles(Profile[] availableProfiles) {
+		final List<String> result = new ArrayList<>();
+		for (Profile profile : availableProfiles) {
+			if (profile.isActiveByDefault()) {
+				result.add(profile.getId());
+			}
+		}
+		return result.toArray(new String[result.size()]);
 	}
 
 	@Override

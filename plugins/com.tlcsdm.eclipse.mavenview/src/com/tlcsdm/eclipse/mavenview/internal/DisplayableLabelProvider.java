@@ -14,6 +14,7 @@ import com.tlcsdm.eclipse.mavenview.Displayable;
 import com.tlcsdm.eclipse.mavenview.MavenViewPreferences;
 import com.tlcsdm.eclipse.mavenview.Phase;
 import com.tlcsdm.eclipse.mavenview.internal.tree.PhaseNode;
+import com.tlcsdm.eclipse.mavenview.internal.tree.ProfileNode;
 
 public class DisplayableLabelProvider extends StyledCellLabelProvider {
 
@@ -54,6 +55,29 @@ public class DisplayableLabelProvider extends StyledCellLabelProvider {
 				cell.setFont(getDefaultFont());
 			}
 			cell.setImage(phaseNode.getImage());
+		} else if (obj instanceof ProfileNode) {
+			ProfileNode profileNode = (ProfileNode) obj;
+			// Profile nodes now use different icons for checked/unchecked state
+			// No need for text prefix - the icon shows the state
+			String displayText = profileNode.getDisplayName();
+			
+			if (profileNode.isSelected()) {
+				// Selected profiles: bold text with blue color
+				TextStyle textStyle = new TextStyle(cell.getFont(), null, null);
+				textStyle.foreground = cell.getControl().getDisplay().getSystemColor(SWT.COLOR_BLUE);
+				StyleRange styleRange = new StyleRange(textStyle);
+				styleRange.start = 0;
+				styleRange.length = displayText.length();
+				styleRange.fontStyle = SWT.BOLD;
+				cell.setText(displayText);
+				cell.setStyleRanges(new StyleRange[] { styleRange });
+			} else {
+				// Unselected profiles: normal text, aligned with other child nodes
+				cell.setText(displayText);
+				cell.setFont(getDefaultFont());
+				cell.setStyleRanges(new StyleRange[] {});
+			}
+			cell.setImage(profileNode.getImage());
 		} else if (obj instanceof Displayable) {
 			Displayable displayable = (Displayable) obj;
 			cell.setText(displayable.getDisplayName());

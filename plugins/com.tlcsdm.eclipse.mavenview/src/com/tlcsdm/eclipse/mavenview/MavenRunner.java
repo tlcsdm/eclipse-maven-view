@@ -40,13 +40,13 @@ public class MavenRunner {
 
 	// Constants from org.eclipse.m2e.actions.MavenLaunchConstants
 	public final static String LAUNCH_CONFIGURATION_TYPE_ID = "org.eclipse.m2e.Maven2LaunchConfigurationType"; //$NON-NLS-1$
-	private final static String ATTR_GOALS = "M2_GOALS"; //$NON-NLS-1$
+	public final static String ATTR_GOALS = "M2_GOALS"; //$NON-NLS-1$
 	private final static String ATTR_PROFILES = "M2_PROFILES"; //$NON-NLS-1$
-	private final static String ATTR_SKIP_TESTS = "M2_SKIP_TESTS";
+	public final static String ATTR_SKIP_TESTS = "M2_SKIP_TESTS";
 	public final static String ATTR_WORKING_DIRECTORY = IJavaLaunchConfigurationConstants.ATTR_WORKING_DIRECTORY;
 
 	// Constants from org.eclipse.m2e.core.internalIMavenConstants
-	private final static String POM_FILE_NAME = "pom.xml"; //$NON-NLS-1$
+	public final static String POM_FILE_NAME = "pom.xml"; //$NON-NLS-1$
 
 	// Misc constants
 	public final static String ATTR_CONFIG = "com.tlcsdm.eclipse.mavenview.config"; //$NON-NLS-1$
@@ -133,6 +133,17 @@ public class MavenRunner {
 	}
 
 	private static void setProjectConfiguration(ILaunchConfigurationWorkingCopy workingCopy, IContainer basedir) {
+		final IProject project = basedir.getProject();
+		if (project != null) {
+			// First try to get user-selected profiles from ProfileSelectionManager
+			final String[] selectedProfiles = ProfileSelectionManager.getSelectedProfiles(project);
+			if (selectedProfiles != null && selectedProfiles.length > 0) {
+				workingCopy.setAttribute(ATTR_PROFILES, String.join(",", selectedProfiles));
+				return;
+			}
+		}
+
+		// Fallback to M2E configuration if no user selection
 		final IMavenProjectRegistry projectManager = MavenPlugin.getMavenProjectRegistry();
 		final IFile pomFile = basedir.getFile(new Path(POM_FILE_NAME));
 		final IMavenProjectFacade projectFacade = projectManager.create(pomFile, false, new NullProgressMonitor());

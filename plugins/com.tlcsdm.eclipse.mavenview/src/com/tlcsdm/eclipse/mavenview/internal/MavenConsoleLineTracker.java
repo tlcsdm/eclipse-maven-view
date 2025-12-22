@@ -30,6 +30,8 @@ import com.tlcsdm.eclipse.mavenview.MavenRunner;
  * <ul>
  * <li>The Maven working directory</li>
  * <li>The executed Maven phases or goals</li>
+ * <li>The selected profiles (if any)</li>
+ * <li>The complete Maven command line</li>
  * </ul>
  *
  * <p>
@@ -90,6 +92,22 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
 			appendConfigInfo(result, Messages.getString("WorkingDirectory"), e.getMessage());
 		}
 		appendConfigInfo(result, Messages.getString("Phases"), mavenConfig.getPhasesAsString());
+		
+		// Output profiles if any are selected
+		final String profilesString = mavenConfig.getProfilesAsString();
+		if (profilesString != null && !profilesString.isEmpty()) {
+			appendConfigInfo(result, Messages.getString("Profiles"), profilesString);
+		}
+		
+		// Try to output the complete Maven command
+		try {
+			final String mavenCommand = buildMavenCommand(launchConfig, mavenConfig);
+			if (mavenCommand != null && !mavenCommand.isEmpty()) {
+				appendConfigInfo(result, Messages.getString("MavenCommand"), mavenCommand);
+			}
+		} catch (final CoreException e) {
+			// we can ignore that
+		}
 
 		result.append(CONSOLE_PREFIX + CONSOLE_SEPARATOR);
 		result.append(CONSOLE_LS);
@@ -99,6 +117,38 @@ public class MavenConsoleLineTracker implements IConsoleLineTracker {
 
 	private static void appendConfigInfo(StringBuilder result, String key, String value) {
 		result.append(CONSOLE_PREFIX).append(key).append(": ").append(value).append(CONSOLE_LS);
+	}
+
+	/**
+	 * Constructs the Maven command line that would be executed.
+	 * 
+	 * @param launchConfig the launch configuration
+	 * @param mavenConfig the Maven run configuration
+	 * @return the Maven command string, or null if it cannot be constructed
+	 * @throws CoreException if there's an error reading launch configuration attributes
+	 */
+	private static String buildMavenCommand(ILaunchConfiguration launchConfig, MavenRunConfig mavenConfig) throws CoreException {
+		final StringBuilder command = new StringBuilder("mvn");
+		
+		// Add goals/phases
+		final String goals = launchConfig.getAttribute(MavenRunner.ATTR_GOALS, (String) null);
+		if (goals != null && !goals.isEmpty()) {
+			command.append(" ").append(goals);
+		}
+		
+		// Add profiles from the launch configuration attribute (M2E standard)
+		final String profiles = launchConfig.getAttribute("M2_PROFILES", (String) null);
+		if (profiles != null && !profiles.isEmpty()) {
+			command.append(" -P").append(profiles);
+		}
+		
+		// Add skip tests if enabled
+		final boolean skipTests = launchConfig.getAttribute(MavenRunner.ATTR_SKIP_TESTS, false);
+		if (skipTests) {
+			command.append(" -DskipTests");
+		}
+		
+		return command.toString();
 	}
 
 	@Override
