@@ -3,10 +3,10 @@ package com.tlcsdm.eclipse.mavenview.internal.tree;
 import java.util.Objects;
 
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.ui.ISharedImages;
-import org.eclipse.ui.PlatformUI;
 
+import com.tlcsdm.eclipse.mavenview.Activator;
 import com.tlcsdm.eclipse.mavenview.Displayable;
+import com.tlcsdm.eclipse.mavenview.MavenViewImages;
 
 /**
  * Represents a Maven dependency in the tree view.
@@ -55,7 +55,7 @@ public class DependencyNode implements Displayable {
 
 	@Override
 	public Image getImage() {
-		return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FILE);
+		return Activator.getImage(MavenViewImages.OBJ_DEPENDENCY);
 	}
 
 	@Override
