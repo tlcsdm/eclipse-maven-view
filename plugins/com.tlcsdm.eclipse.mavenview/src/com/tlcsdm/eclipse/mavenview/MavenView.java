@@ -183,7 +183,7 @@ public class MavenView extends ViewPart {
 	}
 
 	public void expandAll() {
-		BusyIndicator.showWhile(Display.getDefault(), () -> {
+		BusyIndicator.showWhile(this.viewer.getControl().getDisplay(), () -> {
 			this.viewer.getTree().setRedraw(false);
 			try {
 				this.viewer.expandAll();
