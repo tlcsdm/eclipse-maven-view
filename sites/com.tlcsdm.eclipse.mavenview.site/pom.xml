@@ -11,7 +11,7 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>com.tlcsdm.eclipse.mavenview.site</artifactId>
+    <artifactId>com.tlcsdm.eclipse.mavenview.site.eclipse-repository</artifactId>
     <packaging>eclipse-repository</packaging>
 
     <name>[updatesite] com.tlcsdm.eclipse.mavenview.site.eclipse-repository</name>
