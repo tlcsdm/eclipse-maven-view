@@ -295,8 +295,8 @@ version(s), and exceptions or additional permissions here}.&quot;
    </license>
 
    <url>
-      <update label="%updateSiteName" url="https://raw.githubusercontent.com/tlcsdm/eclipse-maven-view/master/update_site/"/>
-      <discovery label="Eclipse Maven View Update Site" url="https://raw.githubusercontent.com/tlcsdm/eclipse-maven-view/master/update_site/"/>
+      <update label="%updateSiteName" url="https://raw.githubusercontent.com/tlcsdm/eclipse-maven-view/update_site/"/>
+      <discovery label="Eclipse Maven View Update Site" url="https://raw.githubusercontent.com/tlcsdm/eclipse-maven-view/update_site/"/>
    </url>
 
    <requires>

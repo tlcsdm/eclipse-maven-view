@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.tlcsdm.eclipse.mavenview</groupId>
+        <artifactId>parent</artifactId>
+        <version>1.0.3</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>com.tlcsdm.eclipse.mavenview.site</artifactId>
+    <packaging>eclipse-repository</packaging>
+
+    <name>[updatesite] com.tlcsdm.eclipse.mavenview.site.eclipse-repository</name>
+
+    <profiles>
+        <profile>
+            <id>sign</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.eclipse.tycho</groupId>
+                        <artifactId>tycho-gpg-plugin</artifactId>
+                        <version>${tycho.version}</version>
+                        <executions>
+                            <execution>
+                                <id>pgp-sign</id>
+                                <goals>
+                                    <goal>sign-p2-artifacts</goal>
+                                </goals>
+                                <phase>verify</phase>
+                                <configuration>
+                                    <keyname>${gpg.keyname}</keyname>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+</project>
