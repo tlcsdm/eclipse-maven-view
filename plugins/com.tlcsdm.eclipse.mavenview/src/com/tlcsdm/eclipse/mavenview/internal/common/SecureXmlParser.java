@@ -50,6 +50,16 @@ public final class SecureXmlParser {
 		} catch (IllegalArgumentException e) {
 			// Feature not supported, continue
 		}
+		try {
+			factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+		} catch (IllegalArgumentException e) {
+			// Attribute not supported, continue
+		}
+		try {
+			factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+		} catch (IllegalArgumentException e) {
+			// Attribute not supported, continue
+		}
 
 		return factory.newDocumentBuilder();
 	}
