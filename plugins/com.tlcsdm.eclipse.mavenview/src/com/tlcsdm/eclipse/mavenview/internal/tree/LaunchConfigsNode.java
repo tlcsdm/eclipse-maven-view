@@ -41,7 +41,7 @@ public class LaunchConfigsNode implements Displayable, Parentable {
 
 	@Override
 	public int hashCode() {
-		return 5 * Objects.hash(this.mavenProject) + 7 * Arrays.hashCode(this.launchConfigs);
+		return Objects.hash(this.mavenProject, Arrays.hashCode(this.launchConfigs));
 	}
 
 	@Override

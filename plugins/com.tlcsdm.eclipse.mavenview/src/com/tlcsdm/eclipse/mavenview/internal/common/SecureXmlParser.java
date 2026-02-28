@@ -11,7 +11,7 @@ import javax.xml.parsers.ParserConfigurationException;
 public final class SecureXmlParser {
 
 	private SecureXmlParser() {
-		// hidden
+		// Utility class - prevent instantiation
 	}
 
 	/**
