@@ -83,7 +83,7 @@ public class ProfileSelectionManager {
 			profileSelections.put(projectName, selectedProfiles);
 		}
 
-		return selectedProfiles.toArray(new String[selectedProfiles.size()]);
+		return selectedProfiles.toArray(new String[0]);
 	}
 
 	private static void persistProfileSelections(String projectName, List<String> selectedProfiles) {

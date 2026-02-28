@@ -95,7 +95,7 @@ public class MavenView extends ViewPart {
 			Object selectedElement = selection.getFirstElement();
 			if (selectedElement instanceof PhaseNode || selectedElement instanceof LaunchConfigNode
 					|| selectedElement instanceof MavenPluginGoalNode) {
-				executeCommand(selectedElement);
+				executeCommand();
 			}
 		});
 		hookMenuToViewer();
@@ -112,13 +112,13 @@ public class MavenView extends ViewPart {
 		this.viewer.refresh(true);
 	}
 
-	private void executeCommand(Object selectedNode) {
+	private void executeCommand() {
 		try {
 			IHandlerService handlerService = (IHandlerService) PlatformUI.getWorkbench()
 					.getService(IHandlerService.class);
 			handlerService.executeCommand("com.tlcsdm.eclipse.mavenview.commands.runMavenPhases", null);
 		} catch (Exception e) {
-			e.printStackTrace();
+			Activator.getDefault().getLog().error("Failed to execute Maven command", e);
 		}
 	}
 
@@ -153,7 +153,7 @@ public class MavenView extends ViewPart {
 				return true;
 			});
 		} catch (CoreException e) {
-			e.printStackTrace();
+			Activator.getDefault().getLog().error("Error handling resource change", e);
 		}
 	}
 

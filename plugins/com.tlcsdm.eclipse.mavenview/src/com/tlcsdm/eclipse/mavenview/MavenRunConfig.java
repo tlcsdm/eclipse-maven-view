@@ -10,9 +10,7 @@ public class MavenRunConfig {
 	private String[] profiles = new String[0];
 
 	public String toGoalString() {
-		final StringBuilder sb = new StringBuilder();
-		sb.append(getPhasesAsString());
-		return sb.toString();
+		return getPhasesAsString();
 	}
 
 	public String getPhasesAsString() {

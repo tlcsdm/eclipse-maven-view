@@ -53,7 +53,7 @@ public class MavenRunner {
 	// Misc constants
 	public final static String ATTR_CONFIG = "com.tlcsdm.eclipse.mavenview.config"; //$NON-NLS-1$
 
-	private final String mode = "run";
+	private static final String mode = "run";
 
 	private final ILaunchManager launchManager;
 	private final ILaunchConfigurationType launchConfigurationType;
@@ -73,7 +73,7 @@ public class MavenRunner {
 		try {
 			final ILaunchConfiguration launchConfiguration = findOrCreateLaunchConfiguration(baseDir, config);
 			if (launchConfiguration != null) {
-				DebugUITools.launch(launchConfiguration, this.mode);
+				DebugUITools.launch(launchConfiguration, mode);
 			}
 		} catch (final CoreException e) {
 			throw new MavenRunnerException(MessageFormat.format(Messages.getString("CannotExecuteOnProjectPattern"),
@@ -96,7 +96,7 @@ public class MavenRunner {
 		try {
 			final ILaunchConfiguration launchConfiguration = createGoalLaunchConfiguration(baseDir, goalCommand);
 			if (launchConfiguration != null) {
-				DebugUITools.launch(launchConfiguration, this.mode);
+				DebugUITools.launch(launchConfiguration, mode);
 			}
 		} catch (final CoreException e) {
 			throw new MavenRunnerException(MessageFormat.format(Messages.getString("CannotExecuteOnProjectPattern"),
@@ -131,28 +131,8 @@ public class MavenRunner {
 			throws CoreException {
 
 		final String goals = config.toGoalString();
-		final String rawConfigName = MessageFormat.format(Messages.getString("ExecutingInPathPattern"), goals,
-				basedir.getLocation().toString());
-		final String safeConfigName = this.launchManager.generateLaunchConfigurationName(rawConfigName);
-
-		final ILaunchConfigurationWorkingCopy workingCopy = this.launchConfigurationType.newInstance(null,
-				safeConfigName);
-		workingCopy.setAttribute(ATTR_WORKING_DIRECTORY, basedir.getLocation().toOSString());
-		workingCopy.setAttribute(MavenRunner.ATTR_GOALS, goals);
-		workingCopy.setAttribute(IDebugUIConstants.ATTR_PRIVATE, true);
-		workingCopy.setAttribute(RefreshTab.ATTR_REFRESH_SCOPE, "${project}"); //$NON-NLS-1$
-		workingCopy.setAttribute(RefreshTab.ATTR_REFRESH_RECURSIVE, true);
-		boolean skipTests = Activator.getDefault().getPreferenceStore().getBoolean(MavenViewPreferences.SKIP_TESTS);
-		workingCopy.setAttribute(MavenRunner.ATTR_SKIP_TESTS, skipTests);
+		final ILaunchConfigurationWorkingCopy workingCopy = createBaseLaunchConfiguration(basedir, goals);
 		workingCopy.setAttribute(ATTR_CONFIG, config);
-
-		setProjectConfiguration(workingCopy, basedir);
-
-		final IPath path = getJreContainerPath(basedir);
-		if (path != null) {
-			workingCopy.setAttribute(IJavaLaunchConfigurationConstants.ATTR_JRE_CONTAINER_PATH,
-					path.toPortableString());
-		}
 
 		return workingCopy;
 	}
@@ -163,14 +143,20 @@ public class MavenRunner {
 	private ILaunchConfiguration createGoalLaunchConfiguration(IContainer basedir, String goalCommand)
 			throws CoreException {
 
-		final String rawConfigName = MessageFormat.format(Messages.getString("ExecutingInPathPattern"), goalCommand,
+		return createBaseLaunchConfiguration(basedir, goalCommand);
+	}
+
+	private ILaunchConfigurationWorkingCopy createBaseLaunchConfiguration(IContainer basedir, String goals)
+			throws CoreException {
+
+		final String rawConfigName = MessageFormat.format(Messages.getString("ExecutingInPathPattern"), goals,
 				basedir.getLocation().toString());
 		final String safeConfigName = this.launchManager.generateLaunchConfigurationName(rawConfigName);
 
 		final ILaunchConfigurationWorkingCopy workingCopy = this.launchConfigurationType.newInstance(null,
 				safeConfigName);
 		workingCopy.setAttribute(ATTR_WORKING_DIRECTORY, basedir.getLocation().toOSString());
-		workingCopy.setAttribute(MavenRunner.ATTR_GOALS, goalCommand);
+		workingCopy.setAttribute(MavenRunner.ATTR_GOALS, goals);
 		workingCopy.setAttribute(IDebugUIConstants.ATTR_PRIVATE, true);
 		workingCopy.setAttribute(RefreshTab.ATTR_REFRESH_SCOPE, "${project}"); //$NON-NLS-1$
 		workingCopy.setAttribute(RefreshTab.ATTR_REFRESH_RECURSIVE, true);
