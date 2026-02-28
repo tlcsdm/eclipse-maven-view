@@ -25,6 +25,7 @@ import com.tlcsdm.eclipse.mavenview.Activator;
 import com.tlcsdm.eclipse.mavenview.Displayable;
 import com.tlcsdm.eclipse.mavenview.MavenRunner;
 import com.tlcsdm.eclipse.mavenview.internal.ProfileSelectionManager;
+import com.tlcsdm.eclipse.mavenview.internal.common.SecureXmlParser;
 
 public class ProjectNode implements Displayable, Parentable {
 
@@ -60,10 +61,10 @@ public class ProjectNode implements Displayable, Parentable {
 					result.add(configuration);
 				}
 			}
-			return result.toArray(new ILaunchConfiguration[result.size()]);
+			return result.toArray(new ILaunchConfiguration[0]);
 		} catch (final CoreException e) {
 			// we can ignore that
-			System.err.println(e.getMessage());
+			Activator.getDefault().getLog().warn("Failed to read launch configurations for project " + project.getName(), e);
 			return new ILaunchConfiguration[0];
 		}
 	}
@@ -123,7 +124,7 @@ public class ProjectNode implements Displayable, Parentable {
 
 		// 4. Run Configurations (only if has launch configs)
 		if (hasLaunchConfigs) {
-			children.add(new launchConfigsNode(this, this.launchConfigs));
+			children.add(new LaunchConfigsNode(this, this.launchConfigs));
 		}
 
 		// 5. Dependencies (only if has dependencies)
@@ -131,7 +132,7 @@ public class ProjectNode implements Displayable, Parentable {
 			children.add(new DependenciesNode(this));
 		}
 
-		return children.toArray(new Object[children.size()]);
+		return children.toArray(new Object[0]);
 	}
 
 	private static Profile[] readAvailableProfiles(IProject project) {
@@ -219,39 +220,7 @@ public class ProjectNode implements Displayable, Parentable {
 				return new Profile[0];
 			}
 
-			// Parse pom.xml using DOM parser
-			final javax.xml.parsers.DocumentBuilderFactory factory = javax.xml.parsers.DocumentBuilderFactory
-					.newInstance();
-			factory.setNamespaceAware(false);
-
-			// Security: Disable external entities to prevent XXE attacks
-			try {
-				factory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
-			} catch (javax.xml.parsers.ParserConfigurationException e) {
-				// Feature not supported, continue
-			}
-			try {
-				factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-			} catch (javax.xml.parsers.ParserConfigurationException e) {
-				// Feature not supported, continue
-			}
-			try {
-				factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-			} catch (javax.xml.parsers.ParserConfigurationException e) {
-				// Feature not supported, continue
-			}
-			try {
-				factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-			} catch (javax.xml.parsers.ParserConfigurationException e) {
-				// Feature not supported, continue
-			}
-			try {
-				factory.setExpandEntityReferences(false);
-			} catch (IllegalArgumentException e) {
-				// Feature not supported, continue
-			}
-
-			final javax.xml.parsers.DocumentBuilder builder = factory.newDocumentBuilder();
+			final javax.xml.parsers.DocumentBuilder builder = SecureXmlParser.createSecureDocumentBuilder();
 			final org.w3c.dom.Document document = builder.parse(pomFile.getContents());
 
 			// Get all profile elements
@@ -306,7 +275,7 @@ public class ProjectNode implements Displayable, Parentable {
 				result.add(profile.getId());
 			}
 		}
-		return result.toArray(new String[result.size()]);
+		return result.toArray(new String[0]);
 	}
 
 	@Override

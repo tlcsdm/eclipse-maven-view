@@ -93,7 +93,7 @@ public enum InitialProjectSelection implements Displayable {
 		result.removeAll(Arrays.asList(MavenViewPreferences.getNeverSelectedProjects()));
 		result.addAll(Arrays.asList(MavenViewPreferences.getAlwaysSelectedProjects()));
 
-		return result.toArray(new IProject[result.size()]);
+		return result.toArray(new IProject[0]);
 	}
 
 	public static IProject[] fetchAllMavenProjects() {
@@ -111,7 +111,7 @@ public enum InitialProjectSelection implements Displayable {
 				// we'll ignore this case
 			}
 		}
-		return result.toArray(new IProject[result.size()]);
+		return result.toArray(new IProject[0]);
 	}
 
 	static boolean isMavenProject(IProject project) throws CoreException {

@@ -18,6 +18,7 @@ import com.tlcsdm.eclipse.mavenview.Activator;
 import com.tlcsdm.eclipse.mavenview.Displayable;
 import com.tlcsdm.eclipse.mavenview.MavenRunner;
 import com.tlcsdm.eclipse.mavenview.MavenViewImages;
+import com.tlcsdm.eclipse.mavenview.internal.common.SecureXmlParser;
 
 /**
  * Parent node for all Maven plugins in a project.
@@ -149,39 +150,7 @@ public class MavenPluginsNode implements Displayable, Parentable {
 				return new MavenPluginNode[0];
 			}
 
-			// Parse pom.xml using DOM parser
-			final javax.xml.parsers.DocumentBuilderFactory factory = javax.xml.parsers.DocumentBuilderFactory
-					.newInstance();
-			factory.setNamespaceAware(false);
-
-			// Security: Disable external entities to prevent XXE attacks
-			try {
-				factory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
-			} catch (javax.xml.parsers.ParserConfigurationException e) {
-				// Feature not supported, continue
-			}
-			try {
-				factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-			} catch (javax.xml.parsers.ParserConfigurationException e) {
-				// Feature not supported, continue
-			}
-			try {
-				factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-			} catch (javax.xml.parsers.ParserConfigurationException e) {
-				// Feature not supported, continue
-			}
-			try {
-				factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-			} catch (javax.xml.parsers.ParserConfigurationException e) {
-				// Feature not supported, continue
-			}
-			try {
-				factory.setExpandEntityReferences(false);
-			} catch (IllegalArgumentException e) {
-				// Feature not supported, continue
-			}
-
-			final javax.xml.parsers.DocumentBuilder builder = factory.newDocumentBuilder();
+			final javax.xml.parsers.DocumentBuilder builder = SecureXmlParser.createSecureDocumentBuilder();
 			final org.w3c.dom.Document document = builder.parse(pomFile.getContents());
 
 			// Get build/plugins/plugin elements

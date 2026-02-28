@@ -1,5 +1,6 @@
 package com.tlcsdm.eclipse.mavenview.internal.tree;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -9,12 +10,12 @@ import com.tlcsdm.eclipse.mavenview.Activator;
 import com.tlcsdm.eclipse.mavenview.Displayable;
 import com.tlcsdm.eclipse.mavenview.MavenViewImages;
 
-public class launchConfigsNode implements Displayable, Parentable {
+public class LaunchConfigsNode implements Displayable, Parentable {
 
 	private final ProjectNode mavenProject;
 	private final ILaunchConfiguration[] launchConfigs;
 
-	public launchConfigsNode(ProjectNode mavenProject, ILaunchConfiguration[] launchConfigs) {
+	public LaunchConfigsNode(ProjectNode mavenProject, ILaunchConfiguration[] launchConfigs) {
 		this.mavenProject = Objects.requireNonNull(mavenProject);
 		this.launchConfigs = Objects.requireNonNull(launchConfigs);
 	}
@@ -40,7 +41,7 @@ public class launchConfigsNode implements Displayable, Parentable {
 
 	@Override
 	public int hashCode() {
-		return 5 * Objects.hash(this.mavenProject) + 7 * Objects.hash((Object[]) this.launchConfigs);
+		return 5 * Objects.hash(this.mavenProject) + 7 * Arrays.hashCode(this.launchConfigs);
 	}
 
 	@Override
@@ -52,9 +53,10 @@ public class launchConfigsNode implements Displayable, Parentable {
 		if (getClass() != obj.getClass())
 			return false;
 
-		final launchConfigsNode that = (launchConfigsNode) obj;
-		if (!Objects.equals(this.mavenProject, that.mavenProject)
-				&& !Objects.deepEquals(this.launchConfigs, that.launchConfigs))
+		final LaunchConfigsNode that = (LaunchConfigsNode) obj;
+		if (!Objects.equals(this.mavenProject, that.mavenProject))
+			return false;
+		if (!Arrays.equals(this.launchConfigs, that.launchConfigs))
 			return false;
 		return true;
 	}
