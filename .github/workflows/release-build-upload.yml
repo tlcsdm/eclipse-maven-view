@@ -26,7 +26,7 @@ jobs:
         run: mvn -B clean verify -ntp -DskipTests
 
       - name: Upload artifact to release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: sites/com.tlcsdm.eclipse.mavenview.site/target/*.zip
         env:
