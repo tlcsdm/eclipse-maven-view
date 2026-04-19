@@ -20,11 +20,13 @@ public class CheckBoxLabelProvider extends LabelProvider {
 	private static final String IMAGE_KEY_GRAYED = "grayedImageCheckBox";
 
 	static {
-		if (JFaceResources.getImageRegistry().getDescriptor(IMAGE_KEY_CHECKED) == null) {
-			JFaceResources.getImageRegistry().put(IMAGE_KEY_CHECKED, createImageFromCheckBox(Boolean.TRUE));
-			JFaceResources.getImageRegistry().put(IMAGE_KEY_UNCHECKED, createImageFromCheckBox(Boolean.FALSE));
-			JFaceResources.getImageRegistry().put(IMAGE_KEY_GRAYED, createImageFromCheckBox(null));
-		}
+		Display.getDefault().syncExec(() -> {
+			if (JFaceResources.getImageRegistry().getDescriptor(IMAGE_KEY_CHECKED) == null) {
+				JFaceResources.getImageRegistry().put(IMAGE_KEY_CHECKED, createImageFromCheckBox(Boolean.TRUE));
+				JFaceResources.getImageRegistry().put(IMAGE_KEY_UNCHECKED, createImageFromCheckBox(Boolean.FALSE));
+				JFaceResources.getImageRegistry().put(IMAGE_KEY_GRAYED, createImageFromCheckBox(null));
+			}
+		});
 	}
 
 	private static Image createImageFromCheckBox(Boolean type) {

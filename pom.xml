@@ -10,6 +10,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <tycho.test.extra.vmargs></tycho.test.extra.vmargs>
     </properties>
 
     <modules>
@@ -63,6 +64,7 @@
                     <useUIThread>false</useUIThread>
                     <product>org.eclipse.platform.ide</product>
                     <application>org.eclipse.ui.ide.workbench</application>
+                    <argLine>${tycho.test.extra.vmargs}</argLine>
                 </configuration>
             </plugin>
             <plugin>
@@ -72,5 +74,17 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>macos</id>
+            <activation>
+                <os><family>mac</family></os>
+            </activation>
+            <properties>
+                <tycho.test.extra.vmargs>-XstartOnFirstThread</tycho.test.extra.vmargs>
+            </properties>
+        </profile>
+    </profiles>
 
 </project>
