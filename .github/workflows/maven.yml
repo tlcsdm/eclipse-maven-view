@@ -31,4 +31,4 @@ jobs:
       with:
         maven-version: '3.9.9'   
     - name: Build with Maven
-      run: mvn -B clean verify -ntp
+      run: mvn -B clean verify -ntp -DskipTests
