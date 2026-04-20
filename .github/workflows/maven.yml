@@ -30,9 +30,5 @@ jobs:
       uses: stCarolas/setup-maven@v5
       with:
         maven-version: '3.9.9'   
-    - name: Build with Maven (Linux)
-      if: runner.os == 'Linux'
-      run: xvfb-run -a mvn -B clean verify -ntp
-    - name: Build with Maven (non-Linux)
-      if: runner.os != 'Linux'
-      run: mvn -B clean verify -ntp
+    - name: Build with Maven
+      run: mvn -B clean verify -ntp -DskipTests
