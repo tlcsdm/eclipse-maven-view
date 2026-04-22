@@ -46,4 +46,4 @@ jobs:
       - name: Build with Maven against Eclipse ${{ matrix.target }}
         # Plugin is currently JavaSE-17, so 2025-03+ targets (with JavaSE-21 IUs) disable EE constraints here.
         # If the plugin baseline is upgraded to JavaSE-21, this split can be removed and EE constraints can stay enabled.
-        run: mvn -B clean verify -ntp -DskipTests "-Dtarget.platform.file=targets/${{ matrix.target }}.target" "-Dtarget.resolve.with.ee.constraints=${{ startsWith(matrix.target, '2024-') && 'true' || 'false' }}"
+        run: mvn -B clean verify -ntp -DskipTests "-Dtarget.platform.file=targets/${{ matrix.target }}.target" "-Dtarget.resolve.with.ee.constraints=${{ startsWith(matrix.target, '2024-') && matrix.target != '2024-12' && 'true' || 'false' }}"
