@@ -10,7 +10,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       # 根据你的项目类型选择合适的构建工具，比如 Maven/Gradle/npm
       - name: Set up JDK 17
