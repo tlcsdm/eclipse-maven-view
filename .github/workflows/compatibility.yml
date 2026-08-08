@@ -15,19 +15,32 @@ permissions:
   contents: read
 
 jobs:
+  discover-targets:
+    runs-on: ubuntu-latest
+    outputs:
+      targets: ${{ steps.targets.outputs.targets }}
+    steps:
+    - uses: actions/checkout@v7
+    - name: Discover target files
+      id: targets
+      shell: bash
+      run: |
+        python - <<'PY'
+        import json
+        import os
+        from pathlib import Path
+
+        targets = sorted(path.stem for path in Path("targets").glob("*.target"))
+        with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+            print(f"targets={json.dumps(targets)}", file=output)
+        PY
+
   compatibility:
+    needs: discover-targets
     strategy:
       fail-fast: false
       matrix:
-        target:
-          - 2024-06
-          - 2024-09
-          - 2024-12
-          - 2025-03
-          - 2025-06
-          - 2025-09
-          - 2025-12
-          - 2026-03
+        target: ${{ fromJson(needs.discover-targets.outputs.targets) }}
     runs-on: windows-latest
     name: Eclipse ${{ matrix.target }}
 

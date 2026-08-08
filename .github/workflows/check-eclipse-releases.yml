@@ -1,0 +1,65 @@
+name: Check Eclipse Platform Releases
+
+on:
+  schedule:
+    # Run on the 1st day of every month at 00:00 UTC
+    - cron: '0 0 1 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check-releases:
+    runs-on: ubuntu-latest
+    name: Check for New Eclipse Releases
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Check for new Eclipse releases
+        id: check
+        run: |
+          python .github/scripts/check_eclipse_releases.py
+
+      - name: Create Pull Request
+        if: steps.check.outputs.changes == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: >-
+            feat(target-platform): add support for
+            Eclipse ${{ steps.check.outputs.new_version }}
+          title: >-
+            feat(target-platform): add support for
+            Eclipse ${{ steps.check.outputs.new_version }}
+          body: |
+            ## Auto-generated Eclipse Platform Update
+
+            This PR was automatically generated to add support for the
+            new Eclipse platform release:
+            **${{ steps.check.outputs.new_version }}**
+
+            ### Changes:
+            - Added new target file:
+            `targets/${{ steps.check.outputs.new_version }}.target`
+            - Compatibility checks will pick up the new target file automatically
+
+            ### Next Steps:
+            - Review the changes
+            - Verify the target file configuration is correct
+            - Run the compatibility workflow to ensure builds work
+            - Merge if everything looks good
+          branch: auto/eclipse-${{ steps.check.outputs.new_version }}
+          delete-branch: true
+          labels: |
+            automated
+            target-platform
