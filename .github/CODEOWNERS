@@ -27,6 +27,9 @@ sites/**                      @unknowIfGuestInDream @DreamAwakenFateBroke
 # update_site
 update_site/**                @unknowIfGuestInDream
 
+# target-platform
+targets/**                    @unknowIfGuestInDream
+
 # tests
 tests/**                      @unknowIfGuestInDream @DreamAwakenFateBroke
 
